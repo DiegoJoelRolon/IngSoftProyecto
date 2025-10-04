@@ -1,0 +1,6 @@
+@IngSoftProyecto_HostAddress = http://localhost:5078
+
+GET {{IngSoftProyecto_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
