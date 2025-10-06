@@ -4,10 +4,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace IngSoftProyecto.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class inicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -206,7 +208,8 @@ namespace IngSoftProyecto.Migrations
                     Email = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Foto = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Eliminado = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -330,6 +333,35 @@ namespace IngSoftProyecto.Migrations
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.InsertData(
+                table: "EstadoMembresia",
+                columns: new[] { "EstadoMembresiaId", "Descripcion" },
+                values: new object[,]
+                {
+                    { 1, "Activa" },
+                    { 2, "Expirada" },
+                    { 3, "Cancelada" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "TipoDeAsistencia",
+                columns: new[] { "TipoDeAsistenciaId", "Descripcion" },
+                values: new object[,]
+                {
+                    { 1, "Gimnasio" },
+                    { 2, "Clase" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "TipoDeMiembro",
+                columns: new[] { "TipoDeMiembroId", "Descripcion", "PorcentajeDescuento" },
+                values: new object[,]
+                {
+                    { 1, "Regular", 0 },
+                    { 2, "Estudiante", 10 },
+                    { 3, "Mayor", 20 }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Asistencia_MembresiaXMiembroId",

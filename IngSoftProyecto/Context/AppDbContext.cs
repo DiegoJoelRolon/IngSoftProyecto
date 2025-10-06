@@ -160,6 +160,21 @@ namespace IngSoftProyecto.Context
                 builder.HasMany(tm => tm.Miembros).WithOne(m => m.TipoDeMiembro);
             });
 
+
+            modelBuilder.Entity<TipoDeMiembro>().HasData(
+                new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "Regular", PorcentajeDescuento = 0 },
+                new TipoDeMiembro { TipoDeMiembroId = 2, Descripcion = "Estudiante", PorcentajeDescuento = 10 },
+                new TipoDeMiembro { TipoDeMiembroId = 3, Descripcion = "Mayor", PorcentajeDescuento = 20 }
+            );
+            modelBuilder.Entity<EstadoMembresia>().HasData(
+                new EstadoMembresia { EstadoMembresiaId = 1, Descripcion = "Activa" },
+                new EstadoMembresia { EstadoMembresiaId = 2, Descripcion = "Expirada" },
+                new EstadoMembresia { EstadoMembresiaId = 3, Descripcion = "Cancelada" }
+            );
+            modelBuilder.Entity<TipoDeAsistencia>().HasData(
+                new TipoDeAsistencia { TipoDeAsistenciaId = 1, Descripcion = "Gimnasio" },
+                new TipoDeAsistencia { TipoDeAsistenciaId = 2, Descripcion = "Clase" }
+            );
         }
     }
 }

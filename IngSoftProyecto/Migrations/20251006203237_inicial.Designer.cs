@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IngSoftProyecto.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251004202707_init")]
-    partial class init
+    [Migration("20251006203237_inicial")]
+    partial class inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -164,6 +164,23 @@ namespace IngSoftProyecto.Migrations
                     b.HasKey("EstadoMembresiaId");
 
                     b.ToTable("EstadoMembresia", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            EstadoMembresiaId = 1,
+                            Descripcion = "Activa"
+                        },
+                        new
+                        {
+                            EstadoMembresiaId = 2,
+                            Descripcion = "Expirada"
+                        },
+                        new
+                        {
+                            EstadoMembresiaId = 3,
+                            Descripcion = "Cancelada"
+                        });
                 });
 
             modelBuilder.Entity("IngSoftProyecto.Models.Membresia", b =>
@@ -242,6 +259,9 @@ namespace IngSoftProyecto.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
+
+                    b.Property<bool>("Eliminado")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -349,6 +369,18 @@ namespace IngSoftProyecto.Migrations
                     b.HasKey("TipoDeAsistenciaId");
 
                     b.ToTable("TipoDeAsistencia", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            TipoDeAsistenciaId = 1,
+                            Descripcion = "Gimnasio"
+                        },
+                        new
+                        {
+                            TipoDeAsistenciaId = 2,
+                            Descripcion = "Clase"
+                        });
                 });
 
             modelBuilder.Entity("IngSoftProyecto.Models.TipoDeMembresia", b =>
@@ -386,6 +418,26 @@ namespace IngSoftProyecto.Migrations
                     b.HasKey("TipoDeMiembroId");
 
                     b.ToTable("TipoDeMiembro", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            TipoDeMiembroId = 1,
+                            Descripcion = "Regular",
+                            PorcentajeDescuento = 0
+                        },
+                        new
+                        {
+                            TipoDeMiembroId = 2,
+                            Descripcion = "Estudiante",
+                            PorcentajeDescuento = 10
+                        },
+                        new
+                        {
+                            TipoDeMiembroId = 3,
+                            Descripcion = "Mayor",
+                            PorcentajeDescuento = 20
+                        });
                 });
 
             modelBuilder.Entity("IngSoftProyecto.Models.Asistencia", b =>

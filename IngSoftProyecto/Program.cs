@@ -21,6 +21,25 @@ builder.Services.AddScoped<ActividadCommand>();
 builder.Services.AddScoped<ActividadService>();
 builder.Services.AddScoped<ActividadMapper>();
 
+builder.Services.AddScoped<MiembroQuery>();
+builder.Services.AddScoped<MiembroCommand>();
+builder.Services.AddScoped<MiembroService>();
+builder.Services.AddScoped<MiembroMapper>();
+builder.Services.AddScoped<TipoDeMiembroQuery>();
+builder.Services.AddScoped<TipoDeMiembroCommand>();
+builder.Services.AddScoped<TipoDeMiembroMapper>();
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
 
 var app = builder.Build();
 
