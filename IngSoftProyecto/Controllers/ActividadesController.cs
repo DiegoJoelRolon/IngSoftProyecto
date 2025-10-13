@@ -1,16 +1,8 @@
-﻿using IngSoftProyecto.Context;
-using IngSoftProyecto.Exceptions;
-using IngSoftProyecto.Models;
+﻿using IngSoftProyecto.Exceptions;
 using IngSoftProyecto.Models.DTOs.Request;
 using IngSoftProyecto.Models.DTOs.Response;
 using IngSoftProyecto.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace IngSoftProyecto.Controllers
 {

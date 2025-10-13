@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IngSoftProyecto.Context
 {
-    public class AppDbContext:DbContext
+    public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-            
+
         }
         public DbSet<Actividad> Actividades { get; set; }
         public DbSet<Asistencia> Asistencias { get; set; }
@@ -44,9 +44,9 @@ namespace IngSoftProyecto.Context
                 builder.HasKey(a => a.AsistenciaId);
                 builder.Property(a => a.AsistenciaId).ValueGeneratedOnAdd();
                 builder.Property(a => a.Fecha).IsRequired();
-        
+
                 builder.HasOne(a => a.TipoDeAsistencia).WithMany(t => t.Asistencias).HasForeignKey(a => a.TipoDeAsistenciaId);
-                builder.HasOne(a=> a.MembresiaXMiembro).WithMany(m=> m.Asistencias).HasForeignKey(a=> a.MembresiaXMiembroId);
+                builder.HasOne(a => a.MembresiaXMiembro).WithMany(m => m.Asistencias).HasForeignKey(a => a.MembresiaXMiembroId);
                 builder.HasOne(a => a.MiembroXClase).WithMany(c => c.Asistencias).HasForeignKey(a => a.MiembroXClaseId);
             });
             modelBuilder.Entity<Clase>(builder =>
@@ -100,7 +100,7 @@ namespace IngSoftProyecto.Context
                 builder.HasOne(mxm => mxm.Pago).WithMany(p => p.MembresiasXMiembro).HasForeignKey(mxm => mxm.PagoId);
                 builder.HasMany(mxm => mxm.Asistencias).WithOne(a => a.MembresiaXMiembro);
             });
-            modelBuilder.Entity <Miembro>(builder =>
+            modelBuilder.Entity<Miembro>(builder =>
             {
                 builder.ToTable("Miembro");
                 builder.HasKey(m => m.MiembroId);
@@ -113,9 +113,9 @@ namespace IngSoftProyecto.Context
                 builder.HasOne(m => m.TipoDeMiembro).WithMany(t => t.Miembros).HasForeignKey(m => m.TipoDeMiembroId);
                 builder.HasOne(m => m.Entrenador).WithMany(e => e.Miembros).HasForeignKey(m => m.EntrenadorId);
                 builder.HasMany(m => m.MembresiasXMiembros).WithOne(mxm => mxm.Miembro);
-                
+
             });
-            modelBuilder.Entity<MiembroXClase>(builder=>
+            modelBuilder.Entity<MiembroXClase>(builder =>
             {
                 builder.ToTable("MiembroXClase");
                 builder.HasKey(mc => mc.MiembroXClaseId);

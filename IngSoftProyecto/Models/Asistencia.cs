@@ -3,7 +3,7 @@
     public class Asistencia
     {
         public int AsistenciaId { get; set; }
-        
+
         public int MiembroXClaseId { get; set; }
         public MiembroXClase MiembroXClase { get; set; }
         public int MembresiaXMiembroId { get; set; }

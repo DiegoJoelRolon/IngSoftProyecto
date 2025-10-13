@@ -13,6 +13,6 @@
         public TimeOnly HoraFin { get; set; }
         public int Cupo { get; set; }
 
-        public List<MiembroXClase>MiembrosXClases { get; set; }
+        public List<MiembroXClase> MiembrosXClases { get; set; }
     }
 }

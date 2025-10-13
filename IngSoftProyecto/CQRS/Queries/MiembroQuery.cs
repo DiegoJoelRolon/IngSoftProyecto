@@ -15,14 +15,14 @@ namespace IngSoftProyecto.CQRS.Queries
         {
             return await _context.Miembros
                 .Include(m => m.TipoDeMiembro)
-                .Include(m=>m.Entrenador)
+                .Include(m => m.Entrenador)
                 .ToListAsync();
         }
         virtual public async Task<Miembro> GetMiembroById(int id)
         {
             return await _context.Miembros
                 .Include(m => m.TipoDeMiembro)
-                .Include(m=>m.Entrenador)
+                .Include(m => m.Entrenador)
                 .FirstOrDefaultAsync(m => m.MiembroId == id);
         }
     }

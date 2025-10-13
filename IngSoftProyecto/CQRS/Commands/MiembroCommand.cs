@@ -5,7 +5,7 @@ namespace IngSoftProyecto.CQRS.Commands
 {
     public class MiembroCommand
     {
-        private  readonly AppDbContext _context;
+        private readonly AppDbContext _context;
         public MiembroCommand(AppDbContext context)
         {
             _context = context;
@@ -16,7 +16,7 @@ namespace IngSoftProyecto.CQRS.Commands
             await _context.SaveChangesAsync();
             return miembro;
         }
-        public virtual async Task <Miembro> UpdateMiembro(Miembro miembro)
+        public virtual async Task<Miembro> UpdateMiembro(Miembro miembro)
         {
             _context.Miembros.Update(miembro);
             await _context.SaveChangesAsync();

@@ -13,7 +13,7 @@
         public required DateTime FechaNacimiento { get; set; }
         public required string Email { get; set; }
         public required string Foto { get; set; }
-        public bool Eliminado { get; set; }=false;
+        public bool Eliminado { get; set; } = false;
 
         public List<MembresiaXMiembro> MembresiasXMiembros { get; set; }
         public List<MiembroXClase> MiembrosXClases { get; set; }

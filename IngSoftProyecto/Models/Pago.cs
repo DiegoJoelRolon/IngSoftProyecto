@@ -7,7 +7,7 @@
         public DateTime FechaPago { get; set; }
         public required string MetodoPago { get; set; }
         public required string DescuentoAplicado { get; set; }
-        
+
         public List<MembresiaXMiembro> MembresiasXMiembro { get; set; }
     }
 }

@@ -29,25 +29,25 @@ namespace IngSoftProyecto.Controllers
 
         // GET: api/Miembros/5
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(MiembroResponse),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MiembroResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<MiembroResponse>> GetMiembroById(int id)
         {
             try
             {
                 var miembro = await _miembroService.GetMiembroById(id);
-                return new JsonResult(miembro) { StatusCode=200};
+                return new JsonResult(miembro) { StatusCode = 200 };
             }
             catch (NotFoundException ex)
             {
-                return NotFound(new {error = ex.Message});
+                return NotFound(new { error = ex.Message });
             }
         }
 
-        
+
         // POST: api/Miembros
         [HttpPost]
-        [ProducesResponseType(typeof(MiembroResponse),201)]
+        [ProducesResponseType(typeof(MiembroResponse), 201)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<MiembroResponse>> AddMiembro(MiembroRequest request)
@@ -75,7 +75,7 @@ namespace IngSoftProyecto.Controllers
         }
         // PUT: api/Miembros/5
         [HttpPut("{id}")]
-        [ProducesResponseType(typeof(MiembroResponse),200)]
+        [ProducesResponseType(typeof(MiembroResponse), 200)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<MiembroResponse>> UpdateMiembro(int id, MiembroRequest request)
@@ -83,7 +83,7 @@ namespace IngSoftProyecto.Controllers
             try
             {
                 var result = await _miembroService.UpdateMiembro(id, request);
-                return new JsonResult(result) { StatusCode=200};
+                return new JsonResult(result) { StatusCode = 200 };
             }
             catch (NotFoundException ex)
             {
@@ -108,7 +108,7 @@ namespace IngSoftProyecto.Controllers
             try
             {
                 var result = await _miembroService.DeleteMiembro(id);
-                return new JsonResult(result) { StatusCode = 200};
+                return new JsonResult(result) { StatusCode = 200 };
             }
             catch (NotFoundException ex)
             {

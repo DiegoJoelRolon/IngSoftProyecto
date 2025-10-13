@@ -29,7 +29,7 @@ namespace IngSoftProyecto.Services
         public virtual async Task<MiembroResponse?> GetMiembroById(int id)
         {
             await MiembroExists(id);
-      
+
             var miembro = await _miembroQuery.GetMiembroById(id);
             if (miembro == null)
                 return null;
@@ -38,7 +38,7 @@ namespace IngSoftProyecto.Services
         public virtual async Task<MiembroResponse> AddMiembro(MiembroRequest request)
         {
             await CheckMiembroRequest(request);
-            
+
             var miembro = new Miembro
             {
                 TipoDeMiembroId = request.TipoDeMiembroId,
@@ -58,7 +58,7 @@ namespace IngSoftProyecto.Services
         {
             await MiembroExists(id);
             await CheckMiembroRequest(request);
-           
+
             var miembro = await _miembroQuery.GetMiembroById(id);
             miembro.TipoDeMiembroId = request.TipoDeMiembroId;
             miembro.EntrenadorId = request.EntrenadorId;
@@ -74,7 +74,7 @@ namespace IngSoftProyecto.Services
         public virtual async Task<MiembroResponse> DeleteMiembro(int id)
         {
             await MiembroExists(id);
-            
+
             var miembro = await _miembroQuery.GetMiembroById(id);
             miembro.Eliminado = true;
             var result = await _miembroCommand.UpdateMiembro(miembro);
@@ -87,7 +87,7 @@ namespace IngSoftProyecto.Services
                 throw new Exception("Miembro no encontrado");
             }
             var miembro = await _miembroQuery.GetMiembroById(id);
-            
+
             miembro.Eliminado = false;
             var result = await _miembroCommand.UpdateMiembro(miembro);
             return await _miembroMapper.GetMiembroResponse(await _miembroQuery.GetMiembroById(result.MiembroId));
@@ -98,7 +98,7 @@ namespace IngSoftProyecto.Services
         private async Task<bool> MiembroExists(int id)
         {
             if (id <= 0 || await _miembroQuery.GetMiembroById(id) == null)
-                    throw new NotFoundException("Id de miembro invalido");
+                throw new NotFoundException("Id de miembro invalido");
             return true;
         }
         public async Task<bool> CheckMiembroRequest(MiembroRequest request)
@@ -113,7 +113,7 @@ namespace IngSoftProyecto.Services
                 throw new BadRequestException("Telefono invalido");
             if (request.FechaNacimiento > DateTime.Now)
                 throw new BadRequestException("FechaNacimiento invalida");
-            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrWhiteSpace(request.Email)|| !request.Email.Contains("@")||!request.Email.ToLower().Contains(".com"))
+            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrWhiteSpace(request.Email) || !request.Email.Contains("@") || !request.Email.ToLower().Contains(".com"))
                 throw new BadRequestException("Email invalido");
             if (string.IsNullOrEmpty(request.Foto) || string.IsNullOrWhiteSpace(request.Foto))
                 throw new BadRequestException("Foto invalida");

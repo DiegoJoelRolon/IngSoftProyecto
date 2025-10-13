@@ -13,7 +13,7 @@ namespace IngSoftProyecto.Services
         private readonly ActividadQuery _actividadQuery;
         private readonly ActividadCommand _actividadCommand;
         private readonly ActividadMapper _actividadMapper = new ActividadMapper();
-        public ActividadService(ActividadQuery actividadQuery,ActividadCommand actividadCommand,ActividadMapper actividadMapper)
+        public ActividadService(ActividadQuery actividadQuery, ActividadCommand actividadCommand, ActividadMapper actividadMapper)
         {
             _actividadQuery = actividadQuery;
             _actividadMapper = actividadMapper;
@@ -32,11 +32,11 @@ namespace IngSoftProyecto.Services
                 Nombre = request.Nombre,
                 Descripcion = request.Descripcion
             };
-           await _actividadCommand.AddActividad(actividad);
-           return await _actividadMapper.GetActividadResponse(actividad);
+            await _actividadCommand.AddActividad(actividad);
+            return await _actividadMapper.GetActividadResponse(actividad);
         }
 
-        public virtual async Task<ActividadResponse>GetActividadById(int id)
+        public virtual async Task<ActividadResponse> GetActividadById(int id)
         {
             await ActividadExists(id);
             var actividad = await _actividadQuery.GetActividadById(id);
