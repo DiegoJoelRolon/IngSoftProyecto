@@ -22,11 +22,11 @@ jobs:
     - name: Restaurar dependencias
       run: dotnet restore
 
-#    - name: Verificar formato del código
-#      run: dotnet format --verify-no-changes --severity warn
+    - name: Verificar formato del código
+      run: dotnet format --verify-no-changes --severity error
 
     - name: Compilar solución (con análisis de código)
-      run: dotnet build --no-restore --configuration Release /warnaserror
+      run: dotnet build --no-restore --configuration Release #/warnaserror
 
     - name: Ejecutar tests
       run: dotnet test --no-build --configuration Release --verbosity normal
