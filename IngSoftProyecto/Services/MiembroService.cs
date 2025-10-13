@@ -1,5 +1,6 @@
 ﻿using IngSoftProyecto.CQRS.Commands;
 using IngSoftProyecto.CQRS.Queries;
+using IngSoftProyecto.Exceptions;
 using IngSoftProyecto.Mapper;
 using IngSoftProyecto.Models;
 using IngSoftProyecto.Models.DTOs.Request;
@@ -11,28 +12,33 @@ namespace IngSoftProyecto.Services
     {
         private readonly MiembroQuery _miembroQuery;
         private readonly MiembroCommand _miembroCommand;
-        private readonly MiembroMapper _miembroMapper = new MiembroMapper();
+        private readonly TipoDeMiembroQuery _tipoDeMiembroQuery;
+        private readonly MiembroMapper _miembroMapper;
 
         public MiembroService(MiembroQuery miembroQuery, MiembroCommand miembroCommand, MiembroMapper miembroMapper, TipoDeMiembroQuery tipoDeMiembroQuery, TipoDeMiembroCommand tipoDeMiembroCommand, TipoDeMiembroMapper tipoDeMiembroMapper)
         {
             _miembroQuery = miembroQuery;
-            _miembroMapper = miembroMapper;
             _miembroCommand = miembroCommand;
-            
+            _tipoDeMiembroQuery = tipoDeMiembroQuery;
+            _miembroMapper = miembroMapper;
         }
-        public async Task<List<MiembroResponse>> GetAllMiembros()
+        public virtual async Task<List<MiembroResponse>> GetAllMiembros()
         {
             return await _miembroMapper.GetAllMiembrosResponse((await _miembroQuery.GetAllMiembros()));
         }
-        public async Task <MiembroResponse?> GetMiembroById(int id)
+        public virtual async Task<MiembroResponse?> GetMiembroById(int id)
         {
+            await MiembroExists(id);
+      
             var miembro = await _miembroQuery.GetMiembroById(id);
             if (miembro == null)
                 return null;
             return await _miembroMapper.GetMiembroResponse(miembro);
         }
-        public async Task<MiembroResponse>AddMiembro(MiembroRequest request)
+        public virtual async Task<MiembroResponse> AddMiembro(MiembroRequest request)
         {
+            await CheckMiembroRequest(request);
+            
             var miembro = new Miembro
             {
                 TipoDeMiembroId = request.TipoDeMiembroId,
@@ -48,7 +54,72 @@ namespace IngSoftProyecto.Services
             var result = await _miembroCommand.AddMiembro(miembro);
             return await _miembroMapper.GetMiembroResponse(await _miembroQuery.GetMiembroById(result.MiembroId));
         }
+        public virtual async Task<MiembroResponse> UpdateMiembro(int id, MiembroRequest request)
+        {
+            await MiembroExists(id);
+            await CheckMiembroRequest(request);
+           
+            var miembro = await _miembroQuery.GetMiembroById(id);
+            miembro.TipoDeMiembroId = request.TipoDeMiembroId;
+            miembro.EntrenadorId = request.EntrenadorId;
+            miembro.Nombre = request.Nombre;
+            miembro.Direccion = request.Direccion;
+            miembro.Telefono = request.Telefono;
+            miembro.FechaNacimiento = request.FechaNacimiento;
+            miembro.Email = request.Email;
+            miembro.Foto = request.Foto;
+            var result = await _miembroCommand.UpdateMiembro(miembro);
+            return await _miembroMapper.GetMiembroResponse(await _miembroQuery.GetMiembroById(result.MiembroId));
+        }
+        public virtual async Task<MiembroResponse> DeleteMiembro(int id)
+        {
+            await MiembroExists(id);
+            
+            var miembro = await _miembroQuery.GetMiembroById(id);
+            miembro.Eliminado = true;
+            var result = await _miembroCommand.UpdateMiembro(miembro);
+            return await _miembroMapper.GetMiembroResponse(await _miembroQuery.GetMiembroById(result.MiembroId));
+        }
+        public virtual async Task<MiembroResponse> RestoreMiembro(int id)
+        {
+            if (!await MiembroExists(id))
+            {
+                throw new Exception("Miembro no encontrado");
+            }
+            var miembro = await _miembroQuery.GetMiembroById(id);
+            
+            miembro.Eliminado = false;
+            var result = await _miembroCommand.UpdateMiembro(miembro);
+            return await _miembroMapper.GetMiembroResponse(await _miembroQuery.GetMiembroById(result.MiembroId));
+        }
 
 
+        //validations
+        private async Task<bool> MiembroExists(int id)
+        {
+            if (id <= 0 || await _miembroQuery.GetMiembroById(id) == null)
+                    throw new NotFoundException("Id de miembro invalido");
+            return true;
+        }
+        public async Task<bool> CheckMiembroRequest(MiembroRequest request)
+        {
+            if (await _tipoDeMiembroQuery.GetTipoDeMiembroById(request.TipoDeMiembroId) == null)
+                throw new NotFoundException("Tipo de miembro no encontrado");
+            if (string.IsNullOrEmpty(request.Nombre) || string.IsNullOrWhiteSpace(request.Nombre))
+                throw new BadRequestException("Nombre invalido");
+            if (string.IsNullOrEmpty(request.Direccion) || string.IsNullOrWhiteSpace(request.Direccion))
+                throw new BadRequestException("Direccion invalida");
+            if (string.IsNullOrEmpty(request.Telefono) || string.IsNullOrWhiteSpace(request.Telefono))
+                throw new BadRequestException("Telefono invalido");
+            if (request.FechaNacimiento > DateTime.Now)
+                throw new BadRequestException("FechaNacimiento invalida");
+            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrWhiteSpace(request.Email)|| !request.Email.Contains("@")||!request.Email.ToLower().Contains(".com"))
+                throw new BadRequestException("Email invalido");
+            if (string.IsNullOrEmpty(request.Foto) || string.IsNullOrWhiteSpace(request.Foto))
+                throw new BadRequestException("Foto invalida");
+            return true;
+
+
+        }
     }
 }

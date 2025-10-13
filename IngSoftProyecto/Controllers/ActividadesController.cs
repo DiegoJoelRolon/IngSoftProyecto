@@ -1,4 +1,5 @@
 ﻿using IngSoftProyecto.Context;
+using IngSoftProyecto.Exceptions;
 using IngSoftProyecto.Models;
 using IngSoftProyecto.Models.DTOs.Request;
 using IngSoftProyecto.Models.DTOs.Response;
@@ -26,17 +27,42 @@ namespace IngSoftProyecto.Controllers
 
         // GET: api/Actividades
         [HttpGet]
+        [ProducesResponseType(typeof(List<ActividadResponse>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<ActividadResponse>>> GetActividades()
         {
-            return await _actividadService.GetAllActividades();
+            var result = await _actividadService.GetAllActividades();
+            return new JsonResult(result) { StatusCode = 200 };
         }
         // POST: api/Actividades
         [HttpPost]
+        [ProducesResponseType(typeof(ActividadResponse), 201)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ActividadResponse>> PostActividad(ActividadRequest request)
         {
-            
-            return await _actividadService.AddActividad(request);
-
+            try
+            {
+                var result = await _actividadService.AddActividad(request);
+                return new JsonResult(result) { StatusCode = 201 };
+            }
+            catch (BadRequestException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(ActividadResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ActividadResponse>> GetActividadById(int id)
+        {
+            try
+            {
+                var actividad = await _actividadService.GetActividadById(id);
+                return new JsonResult(actividad) { StatusCode = 200 };
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
         }
         /*
         // GET: api/Actividades/5
@@ -54,7 +80,6 @@ namespace IngSoftProyecto.Controllers
         }
 
         // PUT: api/Actividades/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutActividad(int id, Actividad actividad)
         {
@@ -84,16 +109,7 @@ namespace IngSoftProyecto.Controllers
             return NoContent();
         }
 
-        // POST: api/Actividades
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Actividad>> PostActividad(Actividad actividad)
-        {
-            _context.Actividades.Add(actividad);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetActividad", new { id = actividad.ActividadId }, actividad);
-        }
+        
 
         // DELETE: api/Actividades/5
         [HttpDelete("{id}")]

@@ -11,11 +11,11 @@ namespace IngSoftProyecto.CQRS.Queries
         {
             _context = context;
         }
-        public async Task<List<Actividad>> GetAllActividades()
+        public virtual async Task<List<Actividad>> GetAllActividades()
         {
             return await _context.Actividades.ToListAsync();
         }
-        public async Task<Actividad?> GetActividadById(int id)
+        public virtual async Task<Actividad?> GetActividadById(int id)
         {
             return await _context.Actividades.FindAsync(id);
         }

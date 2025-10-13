@@ -10,7 +10,7 @@ namespace IngSoftProyecto.CQRS.Commands
         {
             _context = context;
         }
-        public async Task AddTipoDeMiembro(TipoDeMiembro tipoDeMiembro)
+        public virtual async Task AddTipoDeMiembro(TipoDeMiembro tipoDeMiembro)
         {
             _context.TiposDeMiembros.Add(tipoDeMiembro);
             await _context.SaveChangesAsync();

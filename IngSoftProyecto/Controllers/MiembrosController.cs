@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using IngSoftProyecto.Context;
-using IngSoftProyecto.Models;
-using IngSoftProyecto.Services;
-using IngSoftProyecto.Models.DTOs.Response;
+﻿using IngSoftProyecto.Exceptions;
 using IngSoftProyecto.Models.DTOs.Request;
+using IngSoftProyecto.Models.DTOs.Response;
+using IngSoftProyecto.Services;
+using Microsoft.AspNetCore.Mvc;
+
 
 namespace IngSoftProyecto.Controllers
 {
@@ -26,43 +20,117 @@ namespace IngSoftProyecto.Controllers
 
         // GET: api/Miembros
         [HttpGet]
+        [ProducesResponseType(typeof(List<MiembroResponse>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<MiembroResponse>>> GetMiembros()
         {
             var result = await _miembroService.GetAllMiembros();
-            return new JsonResult(result);
+            return new JsonResult(result) { StatusCode = 200 };
         }
 
         // GET: api/Miembros/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<MiembroResponse>> GetMiembro(int id)
+        [ProducesResponseType(typeof(MiembroResponse),StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<MiembroResponse>> GetMiembroById(int id)
         {
-            var miembro = await _miembroService.GetMiembroById(id);
-
-            if (miembro == null)
+            try
             {
-                return NotFound();
+                var miembro = await _miembroService.GetMiembroById(id);
+                return new JsonResult(miembro) { StatusCode=200};
             }
-
-            return new JsonResult(miembro);
+            catch (NotFoundException ex)
+            {
+                return NotFound(new {error = ex.Message});
+            }
         }
 
         
         // POST: api/Miembros
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<MiembroResponse>> PostMiembro(MiembroRequest request)
+        [ProducesResponseType(typeof(MiembroResponse),201)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<MiembroResponse>> AddMiembro(MiembroRequest request)
         {
-            var result = await _miembroService.AddMiembro(request);
-            
-            return new JsonResult(result) { StatusCode = 201 };
+            try
+            {
+                var result = await _miembroService.AddMiembro(request);
+
+                return new JsonResult(result) { StatusCode = 201 };
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (BadRequestException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+
 
         }
-
-        
-
-        /*private bool MiembroExists(int id)
+        // PUT: api/Miembros/5
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(MiembroResponse),200)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<MiembroResponse>> UpdateMiembro(int id, MiembroRequest request)
         {
-            return _context.Miembros.Any(e => e.MiembroId == id);
-        }*/
+            try
+            {
+                var result = await _miembroService.UpdateMiembro(id, request);
+                return new JsonResult(result) { StatusCode=200};
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (BadRequestException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+
+        }
+        // DELETE: api/Miembros/5
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(MiembroResponse), 200)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteMiembro(int id)
+        {
+            try
+            {
+                var result = await _miembroService.DeleteMiembro(id);
+                return new JsonResult(result) { StatusCode = 200};
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+        }
+        // RESTORE: api/Miembros/5
+        [HttpPut("{id}/Restore")]
+        [ProducesResponseType(typeof(MiembroResponse), 200)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> RestoreMiembro(int id)
+        {
+            try
+            {
+                var result = await _miembroService.RestoreMiembro(id);
+                return new JsonResult(result) { StatusCode = 200 };
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+        }
+
     }
 }

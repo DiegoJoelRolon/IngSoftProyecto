@@ -11,11 +11,11 @@ namespace IngSoftProyecto.CQRS.Queries
         {
             _context = context;
         }
-        public async Task<List<TipoDeMiembro>> GetAllTiposDeMiembros()
+        public virtual async Task<List<TipoDeMiembro>> GetAllTiposDeMiembros()
         {
             return await _context.TiposDeMiembros.ToListAsync();
         }
-        public async Task<TipoDeMiembro?> GetTipoDeMiembroById(int id)
+        public virtual async Task<TipoDeMiembro?> GetTipoDeMiembroById(int id)
         {
             return await _context.TiposDeMiembros.FirstOrDefaultAsync(t => t.TipoDeMiembroId == id);
         }

@@ -6,7 +6,7 @@ namespace IngSoftProyecto.Mapper
 {
     public class ActividadMapper
     {
-        public Task<List<ActividadResponse>>GetAllActividadesResponse(List<Actividad>actividades)
+        virtual public Task<List<ActividadResponse>>GetAllActividadesResponse(List<Actividad>actividades)
         {
             List<ActividadResponse> response = new List<ActividadResponse>();
             foreach (var actividad in actividades)
@@ -21,7 +21,7 @@ namespace IngSoftProyecto.Mapper
             return Task.FromResult(response);
 
         }
-        public Task<ActividadResponse> GetActividadResponse(Actividad actividad)
+        virtual public Task<ActividadResponse> GetActividadResponse(Actividad actividad)
         {
             ActividadResponse response = new ActividadResponse
             {

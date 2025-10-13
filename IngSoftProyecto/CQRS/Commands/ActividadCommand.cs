@@ -11,7 +11,7 @@ namespace IngSoftProyecto.CQRS.Commands
         {
             _context = context;
         }
-        public async Task AddActividad(Actividad actividad)
+        public virtual async Task AddActividad(Actividad actividad)
         {
             _context.Actividades.Add(actividad);
             await _context.SaveChangesAsync();

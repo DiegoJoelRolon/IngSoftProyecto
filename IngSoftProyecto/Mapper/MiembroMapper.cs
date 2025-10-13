@@ -6,7 +6,7 @@ namespace IngSoftProyecto.Mapper
     public class MiembroMapper
     {
         private readonly TipoDeMiembroMapper _tipoDeMiembroMapper = new TipoDeMiembroMapper();
-        public async Task<List<MiembroResponse>> GetAllMiembrosResponse(List<Miembro> miembros)
+        virtual public async Task<List<MiembroResponse>> GetAllMiembrosResponse(List<Miembro> miembros)
         {
             List<MiembroResponse> response = new List<MiembroResponse>();
             foreach (var miembro in miembros)
@@ -16,7 +16,7 @@ namespace IngSoftProyecto.Mapper
             return response;
         }
 
-        public async Task<MiembroResponse> GetMiembroResponse(Miembro miembro)
+        virtual public async Task<MiembroResponse> GetMiembroResponse(Miembro miembro)
         {
             MiembroResponse response = new MiembroResponse
             {
