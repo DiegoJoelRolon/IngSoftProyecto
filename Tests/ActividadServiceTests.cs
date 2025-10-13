@@ -52,11 +52,11 @@ namespace Tests
 
 
         [Theory]
-        [InlineData(null, "Clase de yoga", "Nombre")]
-        [InlineData("", "Clase de yoga", "Nombre")]
-        [InlineData("Yoga", null, "Descripcion")]
-        [InlineData("Yoga", "", "Descripcion")]
-        public async Task AddActividad_ThrowsBadRequestException_WhenInvalidFields(string nombre, string descripcion, string campoEsperado)
+        [InlineData(null, "Clase de yoga")]
+        [InlineData("", "Clase de yoga")]
+        [InlineData("Yoga", null)]
+        [InlineData("Yoga", "")]
+        public async Task AddActividad_ThrowsBadRequestException_WhenInvalidFields(string nombre, string descripcion)
         {
             // Arrange
             var actividadQuery = new Mock<ActividadQuery>(null);
