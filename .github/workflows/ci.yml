@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-test-quality:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+
+    - name: Instalar .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restaurar dependencias
+      run: dotnet restore
+
+    - name: Verificar formato del código
+      run: dotnet format --verify-no-changes --severity warn
+
+    - name: Compilar solución (con análisis de código)
+      run: dotnet build --no-restore --configuration Release /warnaserror
+
+    - name: Ejecutar tests
+      run: dotnet test --no-build --configuration Release --verbosity normal
