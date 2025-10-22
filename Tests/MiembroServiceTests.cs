@@ -45,6 +45,7 @@ namespace Tests
             var miembro = new Miembro
             {
                 MiembroId = 1,
+                DNI = 12345678,
                 TipoDeMiembroId = 1,
                 EntrenadorId = 2,
                 Nombre = "Juan",
@@ -115,6 +116,7 @@ namespace Tests
             var miembro = new Miembro
             {
                 MiembroId = 1,
+                DNI= 123454678,
                 TipoDeMiembroId = 1,
                 EntrenadorId = 2,
                 Nombre = "Juan",
@@ -147,6 +149,7 @@ namespace Tests
             var request = new MiembroRequest
             {
                 TipoDeMiembroId = 1,
+                DNI= 123454678,
                 EntrenadorId = 2,
                 Nombre = "Juan",
                 Direccion = "Calle Falsa 123",
@@ -204,6 +207,7 @@ namespace Tests
             var request = new MiembroRequest
             {
                 TipoDeMiembroId = tipoDeMiembroId.HasValue ? tipoDeMiembroId.Value : 1,
+                DNI= 12345678,
                 Nombre = nombre,
                 Direccion = "dir",
                 Telefono = telefono,
@@ -240,6 +244,7 @@ namespace Tests
             var request = new MiembroRequest
             {
                 TipoDeMiembroId = 9999,
+                DNI = 12345678,
                 Nombre = "test",
                 Direccion = "dir",
                 Telefono = "123",
@@ -266,6 +271,7 @@ namespace Tests
             {
                 MiembroId = 1,
                 TipoDeMiembroId = 1,
+                DNI = 12345678,
                 EntrenadorId = 2,
                 Nombre = "Juan",
                 Direccion = "Calle Falsa 123",
@@ -297,6 +303,7 @@ namespace Tests
             var request = new MiembroRequest
             {
                 TipoDeMiembroId = 1,
+                DNI = 12345678,
                 EntrenadorId = 2,
                 Nombre = "Juan",
                 Direccion = "Calle Falsa 123",
@@ -335,6 +342,7 @@ namespace Tests
             var request = new MiembroRequest
             {
                 TipoDeMiembroId = 1,
+                DNI = 12345678,
                 EntrenadorId = 2,
                 Nombre = "Juan",
                 Direccion = "Calle Falsa 123",
@@ -360,6 +368,7 @@ namespace Tests
                 MiembroId = 1,
                 TipoDeMiembroId = 1,
                 EntrenadorId = 2,
+                DNI = 12345678,
                 Nombre = "Juan",
                 Direccion = "Calle Falsa 123",
                 Telefono = "555-1234",
@@ -382,6 +391,7 @@ namespace Tests
             {
                 TipoDeMiembroId = 9999,
                 EntrenadorId = 2,
+                DNI = 12345678,
                 Nombre = "Juan",
                 Direccion = "Calle Falsa 123",
                 Telefono = "555-1234",
@@ -419,6 +429,7 @@ namespace Tests
             var miembro = new Miembro
             {
                 MiembroId = 1,
+                DNI = 12345678,
                 TipoDeMiembroId = 1,
                 EntrenadorId = 2,
                 Nombre = "Juan",
@@ -441,6 +452,7 @@ namespace Tests
             {
                 TipoDeMiembroId = tipoDeMiembroId ?? 1,
                 Nombre = nombre,
+                DNI = 12345678,
                 Direccion = "Calle Falsa 123",
                 Telefono = telefono,
                 FechaNacimiento = fechaNacimiento,
@@ -465,6 +477,7 @@ namespace Tests
             var miembro = new Miembro
             {
                 MiembroId = 1,
+                DNI = 12345678,
                 TipoDeMiembroId = 1,
                 EntrenadorId = 2,
                 Nombre = "Juan",
@@ -479,6 +492,7 @@ namespace Tests
             var miembroEliminado = new Miembro
             {
                 MiembroId = miembro.MiembroId,
+                DNI = miembro.DNI,
                 TipoDeMiembroId = miembro.TipoDeMiembroId,
                 TipoDeMiembro = miembro.TipoDeMiembro,
                 EntrenadorId = miembro.EntrenadorId,
@@ -552,6 +566,7 @@ namespace Tests
             var miembro = new Miembro
             {
                 MiembroId = 1,
+                DNI = 12345678,
                 TipoDeMiembroId = 1,
                 EntrenadorId = 2,
                 Nombre = "Juan",
@@ -566,6 +581,7 @@ namespace Tests
             var miembroRestaurado = new Miembro
             {
                 MiembroId = miembro.MiembroId,
+                DNI = miembro.DNI,
                 TipoDeMiembroId = miembro.TipoDeMiembroId,
                 TipoDeMiembro = miembro.TipoDeMiembro,
                 EntrenadorId = miembro.EntrenadorId,

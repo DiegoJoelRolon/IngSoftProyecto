@@ -41,6 +41,7 @@ namespace IngSoftProyecto.Services
 
             var miembro = new Miembro
             {
+                DNI= request.DNI,
                 TipoDeMiembroId = request.TipoDeMiembroId,
                 EntrenadorId = request.EntrenadorId,
                 Nombre = request.Nombre,
@@ -60,6 +61,7 @@ namespace IngSoftProyecto.Services
             await CheckMiembroRequest(request);
 
             var miembro = await _miembroQuery.GetMiembroById(id);
+            miembro.DNI= request.DNI;
             miembro.TipoDeMiembroId = request.TipoDeMiembroId;
             miembro.EntrenadorId = request.EntrenadorId;
             miembro.Nombre = request.Nombre;

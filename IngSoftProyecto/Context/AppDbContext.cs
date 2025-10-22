@@ -26,6 +26,7 @@ namespace IngSoftProyecto.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            /*
             modelBuilder.Entity<Actividad>(builder =>
             {
                 builder.ToTable("Actividad");
@@ -159,7 +160,7 @@ namespace IngSoftProyecto.Context
 
                 builder.HasMany(tm => tm.Miembros).WithOne(m => m.TipoDeMiembro);
             });
-
+            */
 
             modelBuilder.Entity<TipoDeMiembro>().HasData(
                 new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "Regular", PorcentajeDescuento = 0 },
