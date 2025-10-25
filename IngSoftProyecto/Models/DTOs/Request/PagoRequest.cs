@@ -1,13 +1,10 @@
-﻿namespace IngSoftProyecto.Models
+﻿namespace IngSoftProyecto.Models.DTOs.Request
 {
-    public class Pago
+    public class PagoRequest
     {
-        public int PagoId { get; set; }
         public decimal Monto { get; set; }
         public DateTime FechaPago { get; set; }
         public required string MetodoPago { get; set; }
         public required int DescuentoAplicado { get; set; }
-
-        public List<MembresiaXMiembro> MembresiasXMiembro { get; set; }
     }
 }

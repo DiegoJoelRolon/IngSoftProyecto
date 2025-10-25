@@ -21,6 +21,19 @@ namespace IngSoftProyecto.CQRS.Commands
             await _context.SaveChangesAsync();
             return entrenador;
         }
+        public virtual async Task DeleteEntrenadorAsync(Entrenador entrenador)
+        {
+            entrenador.Eliminado = true;
+            _context.Entrenadores.Update(entrenador);
+            await _context.SaveChangesAsync();
+        }
+        public virtual async Task<Entrenador> RestoreEntrenadorAsync(Entrenador entrenador)
+        {
+            entrenador.Eliminado = false;
+            _context.Entrenadores.Update(entrenador);
+            await _context.SaveChangesAsync();
+            return entrenador;
+        }
 
     }
 }

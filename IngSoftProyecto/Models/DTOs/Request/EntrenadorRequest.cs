@@ -9,7 +9,6 @@
         public required string Direccion { get; set; }
         public required string Email { get; set; }
         public required string Foto { get; set; }
-        public bool Eliminado { get; set; } = false;
 
         public required string Certificacion { get; set; }
         public required bool Activo { get; set; }

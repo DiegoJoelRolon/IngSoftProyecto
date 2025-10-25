@@ -23,7 +23,7 @@ namespace IngSoftProyecto.CQRS.Queries
             return await _context.Miembros
                 .Include(m => m.TipoDeMiembro)
                 .Include(m => m.Entrenador)
-                .FirstOrDefaultAsync(m => m.MiembroId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
         }
     }
 }

@@ -74,6 +74,22 @@ namespace IngSoftProyecto.Controllers
             }
         }
 
+        [HttpPut("{id}/Restore")]
+        [ProducesResponseType(typeof(EntrenadorResponse), 200)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<EntrenadorResponse>> RestoreEntrenador(int id)
+        {
+            try
+            {
+                var result = await _entrenadorService.RestoreEntrenadorAsync(id);
+                return new JsonResult(result) { StatusCode = 200 };
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+        }
+
         // POST: api/Entrenadores
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]

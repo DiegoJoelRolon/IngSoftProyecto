@@ -18,7 +18,10 @@ namespace IngSoftProyecto.CQRS.Queries
         }
         public virtual async Task<Clase?> GetClaseById(int id)
         {
-            return await _context.Clases.FindAsync(id);
+            return await _context.Clases
+                .Include(c => c.Actividad)
+                .Include(c => c.Entrenador)
+                .FirstAsync(c=>c.ClaseId==id);
         }
 
     }

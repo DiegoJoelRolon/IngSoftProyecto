@@ -49,5 +49,27 @@ namespace IngSoftProyecto.Mapper
             }
             return Task.FromResult(responses);
         }
+
+        virtual public Task<GenericResponse> GetGenericResponse(EstadoMembresia estadoMembresia)
+        {
+            GenericResponse response = new GenericResponse
+            {
+                Descripcion = estadoMembresia.Descripcion
+            };
+            return Task.FromResult(response);
+        }
+        virtual public Task<List<GenericResponse>> GetAllGenericResponse(List<EstadoMembresia> estadosMembresias)
+        {
+            List<GenericResponse> responses = new List<GenericResponse>();
+            foreach (var item in estadosMembresias)
+            {
+                GenericResponse response = new GenericResponse
+                {
+                    Descripcion = item.Descripcion
+                };
+                responses.Add(response);
+            }
+            return Task.FromResult(responses);
+        }
     }
 }

@@ -44,7 +44,7 @@ namespace Tests
             var tipoDeMiembro = new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "desc", PorcentajeDescuento = 10 };
             var miembro = new Miembro
             {
-                MiembroId = 1,
+                Id = 1,
                 DNI = 12345678,
                 TipoDeMiembroId = 1,
                 EntrenadorId = 2,
@@ -115,7 +115,7 @@ namespace Tests
             var tipoDeMiembro = new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "desc", PorcentajeDescuento = 10 };
             var miembro = new Miembro
             {
-                MiembroId = 1,
+                Id = 1,
                 DNI= 123454678,
                 TipoDeMiembroId = 1,
                 EntrenadorId = 2,
@@ -269,7 +269,7 @@ namespace Tests
             var tipoDeMiembro = new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "desc", PorcentajeDescuento = 10 };
             var miembro = new Miembro
             {
-                MiembroId = 1,
+                Id = 1,
                 TipoDeMiembroId = 1,
                 DNI = 12345678,
                 EntrenadorId = 2,
@@ -365,7 +365,7 @@ namespace Tests
 
             var miembroExistente = new Miembro
             {
-                MiembroId = 1,
+                Id = 1,
                 TipoDeMiembroId = 1,
                 EntrenadorId = 2,
                 DNI = 12345678,
@@ -428,7 +428,7 @@ namespace Tests
 
             var miembro = new Miembro
             {
-                MiembroId = 1,
+                Id = 1,
                 DNI = 12345678,
                 TipoDeMiembroId = 1,
                 EntrenadorId = 2,
@@ -476,7 +476,7 @@ namespace Tests
             var tipoDeMiembro = new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "desc", PorcentajeDescuento = 10 };
             var miembro = new Miembro
             {
-                MiembroId = 1,
+                Id = 1,
                 DNI = 12345678,
                 TipoDeMiembroId = 1,
                 EntrenadorId = 2,
@@ -491,7 +491,7 @@ namespace Tests
             };
             var miembroEliminado = new Miembro
             {
-                MiembroId = miembro.MiembroId,
+                Id = miembro.Id,
                 DNI = miembro.DNI,
                 TipoDeMiembroId = miembro.TipoDeMiembroId,
                 TipoDeMiembro = miembro.TipoDeMiembro,
@@ -565,7 +565,7 @@ namespace Tests
             var tipoDeMiembro = new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "desc", PorcentajeDescuento = 10 };
             var miembro = new Miembro
             {
-                MiembroId = 1,
+                Id = 1,
                 DNI = 12345678,
                 TipoDeMiembroId = 1,
                 EntrenadorId = 2,
@@ -580,7 +580,7 @@ namespace Tests
             };
             var miembroRestaurado = new Miembro
             {
-                MiembroId = miembro.MiembroId,
+                Id = miembro.Id         ,
                 DNI = miembro.DNI,
                 TipoDeMiembroId = miembro.TipoDeMiembroId,
                 TipoDeMiembro = miembro.TipoDeMiembro,

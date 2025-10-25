@@ -53,7 +53,7 @@ namespace IngSoftProyecto.Services
                 Eliminado = false
             };
             var result = await _miembroCommand.AddMiembro(miembro);
-            return await _miembroMapper.GetMiembroResponse(await _miembroQuery.GetMiembroById(result.MiembroId));
+            return await _miembroMapper.GetMiembroResponse(await _miembroQuery.GetMiembroById(result.Id));
         }
         public virtual async Task<MiembroResponse> UpdateMiembro(int id, MiembroRequest request)
         {
@@ -71,7 +71,7 @@ namespace IngSoftProyecto.Services
             miembro.Email = request.Email;
             miembro.Foto = request.Foto;
             var result = await _miembroCommand.UpdateMiembro(miembro);
-            return await _miembroMapper.GetMiembroResponse(await _miembroQuery.GetMiembroById(result.MiembroId));
+            return await _miembroMapper.GetMiembroResponse(await _miembroQuery.GetMiembroById(result.Id));
         }
         public virtual async Task<MiembroResponse> DeleteMiembro(int id)
         {
@@ -80,19 +80,16 @@ namespace IngSoftProyecto.Services
             var miembro = await _miembroQuery.GetMiembroById(id);
             miembro.Eliminado = true;
             var result = await _miembroCommand.UpdateMiembro(miembro);
-            return await _miembroMapper.GetMiembroResponse(await _miembroQuery.GetMiembroById(result.MiembroId));
+            return await _miembroMapper.GetMiembroResponse(await _miembroQuery.GetMiembroById(result.Id));
         }
         public virtual async Task<MiembroResponse> RestoreMiembro(int id)
         {
-            if (!await MiembroExists(id))
-            {
-                throw new Exception("Miembro no encontrado");
-            }
+            await MiembroExists(id);
             var miembro = await _miembroQuery.GetMiembroById(id);
 
             miembro.Eliminado = false;
             var result = await _miembroCommand.UpdateMiembro(miembro);
-            return await _miembroMapper.GetMiembroResponse(await _miembroQuery.GetMiembroById(result.MiembroId));
+            return await _miembroMapper.GetMiembroResponse(await _miembroQuery.GetMiembroById(result.Id));
         }
 
 

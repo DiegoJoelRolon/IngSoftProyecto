@@ -2,37 +2,36 @@
 using IngSoftProyecto.Models.DTOs.Request;
 using IngSoftProyecto.Models.DTOs.Response;
 using IngSoftProyecto.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IngSoftProyecto.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClaseController : ControllerBase
+    public class AsistenciasController : ControllerBase
     {
-        private readonly ClaseService _claseService;
-        public ClaseController(ClaseService claseService)
+        private readonly AsistenciaService _asistenciaService;
+        public AsistenciasController(AsistenciaService asistenciaService)
         {
-            _claseService = claseService;
+            _asistenciaService = asistenciaService;
         }
-        // GET: api/<ClaseController>
+        
         [HttpGet]
-        [ProducesResponseType(typeof(List<ClaseResponse>),200)]
-        public async Task<ActionResult<List<ClaseResponse>>>GetAllClases()
+        [ProducesResponseType(typeof(List<AsistenciaResponse>), 200)]
+        public async Task<ActionResult<List<AsistenciaResponse>>> GetAllAsistencias()
         {
-            var result = await _claseService.GetAllClases();
+            var result = await _asistenciaService.GetAllAsistencias();
             return new JsonResult(result) { StatusCode = 200 };
         }
-
-        // GET api/<ClaseController>/5
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(ClaseResponse),200)]
+        [ProducesResponseType(typeof(AsistenciaResponse), 200)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ClaseResponse>> GetClaseById(int id)
+        public async Task<ActionResult<AsistenciaResponse>> GetAsistenciaeById(int id)
         {
             try
             {
-                var result = await _claseService.GetClaseById(id);
+                var result = await _asistenciaService.GetAsistenciaById(id);
                 return new JsonResult(result) { StatusCode = 200 };
             }
             catch (NotFoundException ex)
@@ -41,15 +40,14 @@ namespace IngSoftProyecto.Controllers
             }
         }
 
-        // POST api/<ClaseController>
         [HttpPost]
-        [ProducesResponseType(typeof(ClaseResponse), 201)]
+        [ProducesResponseType(typeof(AsistenciaResponse), 201)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<ClaseResponse>> PostClase(ClaseRequest request)
+        public async Task<ActionResult<AsistenciaResponse>> PostAsistencia(AsistenciaRequest request)
         {
             try
             {
-                var result = await _claseService.AddClaseAsync(request);
+                var result = await _asistenciaService.AddAsistencia(request);
                 return new JsonResult(result) { StatusCode = 201 };
             }
             catch (BadRequestException ex)
@@ -58,27 +56,24 @@ namespace IngSoftProyecto.Controllers
             }
         }
 
-        // PUT api/<ClaseController>/5
+
         [HttpPut("{id}")]
-        [ProducesResponseType(typeof(ClaseResponse), 200)]
+        [ProducesResponseType(typeof(AsistenciaResponse), 200)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ClaseResponse>> PutClase(int id, ClaseRequest request)
+        public async Task<ActionResult<AsistenciaResponse>> PutAsistencia(int id, AsistenciaRequest request)
         {
             try
             {
-                var result = await _claseService.UpdateClase(id,request);
+                var result = await _asistenciaService.UpdateAsistencia(id, request);
                 return new JsonResult(result) { StatusCode = 200 };
             }
             catch (BadRequestException ex)
             {
                 return BadRequest(new { error = ex.Message });
             }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { error = ex.Message });
-            }
         }
+
+
 
     }
 }

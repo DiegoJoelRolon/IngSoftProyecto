@@ -1,9 +1,10 @@
 ﻿using IngSoftProyecto.CQRS.Commands;
 using IngSoftProyecto.CQRS.Queries;
+using IngSoftProyecto.Exceptions;
 using IngSoftProyecto.Mapper;
-using IngSoftProyecto.Models.DTOs.Response;
-using IngSoftProyecto.Models.DTOs.Request;
 using IngSoftProyecto.Models;
+using IngSoftProyecto.Models.DTOs.Request;
+using IngSoftProyecto.Models.DTOs.Response;
 namespace IngSoftProyecto.Services
 {
     public class ClaseService
@@ -11,11 +12,15 @@ namespace IngSoftProyecto.Services
         private readonly ClaseQuery _claseQuery;
         private readonly ClaseCommand _claseCommand;
         private readonly ClaseMapper _claseMapper;
-        public ClaseService(ClaseQuery claseQuery, ClaseCommand claseCommand, ClaseMapper claseMapper)
+        private readonly ActividadService _actividadService;
+        private readonly EntrenadorService _entrenadorService;
+        public ClaseService(ClaseQuery claseQuery, ClaseCommand claseCommand, ClaseMapper claseMapper, ActividadService actividadService,EntrenadorService entrenadorService)
         {
             _claseQuery = claseQuery;
             _claseMapper = claseMapper;
             _claseCommand = claseCommand;
+            _actividadService = actividadService;
+            _entrenadorService = entrenadorService;
         }
 
         public virtual async Task<List<ClaseResponse>> GetAllClases()
@@ -24,11 +29,13 @@ namespace IngSoftProyecto.Services
         }
         public virtual async Task<ClaseResponse> GetClaseById(int claseId)
         {
+            await ClaseExists(claseId);
             var clase = await _claseQuery.GetClaseById(claseId);
             return await _claseMapper.GetClaseResponse(clase);
         }
         public virtual async Task<ClaseResponse> AddClaseAsync(ClaseRequest claseRequest)
         {
+            await CheckClaseRequest(claseRequest);
             var clase = new Clase
             {
                 ActividadId = claseRequest.ActividadId,
@@ -42,8 +49,11 @@ namespace IngSoftProyecto.Services
             return await _claseMapper.GetClaseResponse(await _claseQuery.GetClaseById(result.ClaseId));
 
         }
-        public virtual async Task<ClaseResponse>UpdateClase(int claseId, ClaseRequest claseRequest)
+        public virtual async Task<ClaseResponse> UpdateClase(int claseId, ClaseRequest claseRequest)
         {
+            await ClaseExists(claseId);
+            await CheckClaseRequest(claseRequest);
+
             var clase = await _claseQuery.GetClaseById(claseId);
             clase.ActividadId = claseRequest.ActividadId;
             clase.EntrenadorId = claseRequest.EntrenadorId;
@@ -59,6 +69,25 @@ namespace IngSoftProyecto.Services
             var clase = await _claseQuery.GetClaseById(claseId);
             await _claseCommand.DeleteClase(clase);
             return await _claseMapper.GetClaseResponse(clase);
+        }
+
+        private async Task<bool> ClaseExists(int claseId)
+        {
+            if (claseId <= 0 || await _claseQuery.GetClaseById(claseId) == null)
+                throw new NotFoundException("Id de clase invalido");
+            return true;
+        }
+        private async Task<bool> CheckClaseRequest(ClaseRequest request)
+        {
+            if (await _entrenadorService.GetEntrenadorById(request.EntrenadorId)==null)
+            {
+                throw new BadRequestException("Datos de Entrenador invalidos");
+            }
+            if (await _actividadService.GetActividadById(request.ActividadId)==null)
+            {
+                throw new BadRequestException("Datos de Actividad invalidos");
+            }
+            return true;
         }
     }
 }

@@ -22,11 +22,24 @@ namespace IngSoftProyecto.Context
         public DbSet<TipoDeAsistencia> TiposDeAsistencias { get; set; }
         public DbSet<TipoDeMembresia> TiposDeMembresias { get; set; }
         public DbSet<TipoDeMiembro> TiposDeMiembros { get; set; }
+        public DbSet<Persona> Personas { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            /*
+            modelBuilder.Entity<Persona>(builder =>
+            {
+                builder.ToTable("Persona");
+                builder.HasKey(p => p.Id);
+                builder.Property(p => p.Id).ValueGeneratedOnAdd();
+                builder.Property(p => p.Nombre).IsRequired().HasMaxLength(100);
+                builder.Property(p => p.DNI);
+                builder.Property(p => p.FechaNacimiento).IsRequired();
+                builder.Property(p => p.Telefono).HasMaxLength(20);
+                builder.Property(p => p.Direccion).HasMaxLength(100);
+                builder.Property(p => p.Email).IsRequired().HasMaxLength(100);
+            });
+
             modelBuilder.Entity<Actividad>(builder =>
             {
                 builder.ToTable("Actividad");
@@ -62,11 +75,7 @@ namespace IngSoftProyecto.Context
             modelBuilder.Entity<Entrenador>(builder =>
             {
                 builder.ToTable("Entrenador");
-                builder.HasKey(e => e.EntrenadorId);
-                builder.Property(e => e.EntrenadorId).ValueGeneratedOnAdd();
-                builder.Property(e => e.Nombre).IsRequired().HasMaxLength(100);
-                builder.Property(e => e.Telefono).HasMaxLength(15);
-                builder.Property(e => e.Email).IsRequired().HasMaxLength(100);
+               
                 builder.HasMany(e => e.Clases).WithOne(c => c.Entrenador);
                 builder.HasMany(e => e.Miembros).WithOne(m => m.Entrenador);
             });
@@ -104,13 +113,6 @@ namespace IngSoftProyecto.Context
             modelBuilder.Entity<Miembro>(builder =>
             {
                 builder.ToTable("Miembro");
-                builder.HasKey(m => m.MiembroId);
-                builder.Property(m => m.MiembroId).ValueGeneratedOnAdd();
-                builder.Property(m => m.Nombre).IsRequired().HasMaxLength(100);
-                builder.Property(m => m.Direccion).HasMaxLength(200);
-                builder.Property(m => m.Telefono).HasMaxLength(15);
-                builder.Property(m => m.Email).IsRequired().HasMaxLength(100);
-                builder.Property(m => m.Foto).HasMaxLength(200);
                 builder.HasOne(m => m.TipoDeMiembro).WithMany(t => t.Miembros).HasForeignKey(m => m.TipoDeMiembroId);
                 builder.HasOne(m => m.Entrenador).WithMany(e => e.Miembros).HasForeignKey(m => m.EntrenadorId);
                 builder.HasMany(m => m.MembresiasXMiembros).WithOne(mxm => mxm.Miembro);
@@ -160,7 +162,7 @@ namespace IngSoftProyecto.Context
 
                 builder.HasMany(tm => tm.Miembros).WithOne(m => m.TipoDeMiembro);
             });
-            */
+            
 
             modelBuilder.Entity<TipoDeMiembro>().HasData(
                 new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "Regular", PorcentajeDescuento = 0 },

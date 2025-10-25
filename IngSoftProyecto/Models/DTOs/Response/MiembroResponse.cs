@@ -2,8 +2,9 @@
 {
     public class MiembroResponse
     {
+        public required int Id { get; set; }
         public required int TipoDeMiembroId { get; set; }
-        public int? EntrenadorId { get; set; }
+        public EntrenadorResponse? Entrenador { get; set; }
         public required string Nombre { get; set; }
         public required string Direccion { get; set; }
         public required string Telefono { get; set; }

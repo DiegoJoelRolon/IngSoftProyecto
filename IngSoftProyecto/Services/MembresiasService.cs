@@ -1,5 +1,6 @@
 ﻿using IngSoftProyecto.CQRS.Commands;
 using IngSoftProyecto.CQRS.Queries;
+using IngSoftProyecto.Exceptions;
 using IngSoftProyecto.Mapper;
 using IngSoftProyecto.Models;
 using IngSoftProyecto.Models.DTOs.Request;
@@ -28,6 +29,7 @@ namespace IngSoftProyecto.Services
         }
         public virtual async Task<MembresiaResponse?> GetMembresiaById(int id)
         {
+            await MembresiaExists(id);
             var membresia =  await _query.GetMembresiaById(id);
             if (membresia == null)
             {
@@ -37,6 +39,7 @@ namespace IngSoftProyecto.Services
         }
         public virtual async Task<MembresiaResponse> AddMembresia(MembresiaRequest request)
         {
+            await CheckMembresiaRequest(request);
             var membresia = new Membresia
             {
                 TipoDeMembresiaId = request.TipoDeMembresiaId,
@@ -49,6 +52,8 @@ namespace IngSoftProyecto.Services
         }
         public virtual async Task<MembresiaResponse> UpdateMembresia(int id, MembresiaRequest request)
         {
+            await MembresiaExists(id);
+            await CheckMembresiaRequest(request);
             var membresia = new Membresia
             {
                 TipoDeMembresiaId = request.TipoDeMembresiaId,
@@ -58,6 +63,32 @@ namespace IngSoftProyecto.Services
             
             var result = await _command.UpdateMembresia(membresia);
             return await _membresiaMapper.GetMembresiaResponse(result);
+        }
+        // Validaciones
+        private async Task<bool> MembresiaExists(int id)
+        {
+
+            if (id <= 0 || await _query.GetMembresiaById(id) == null)
+                throw new NotFoundException("Id de membresia invalido");
+            return true;
+        }
+
+        private async Task<bool> CheckMembresiaRequest(MembresiaRequest request)
+        {
+            if (request == null)
+                throw new BadRequestException("Datos de membresia invalidos");
+
+            var tipo = await _tipoDeMembresiaService.GetTipoDeMembresiaById(request.TipoDeMembresiaId);
+            if (tipo == null)
+                throw new NotFoundException("Tipo de membresia no encontrado");
+
+            if (request.DuracionEnDias <= 0)
+                throw new BadRequestException("DuracionEnDias invalida");
+
+            if (request.CostoBase <= 0)
+                throw new BadRequestException("CostoBase invalido");
+
+            return true;
         }
     }
 }

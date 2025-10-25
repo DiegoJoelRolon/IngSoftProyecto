@@ -1,6 +1,6 @@
-﻿namespace IngSoftProyecto.Models
+﻿namespace IngSoftProyecto.Models.DTOs.Response
 {
-    public class Pago
+    public class PagoResponse
     {
         public int PagoId { get; set; }
         public decimal Monto { get; set; }
@@ -8,6 +8,5 @@
         public required string MetodoPago { get; set; }
         public required int DescuentoAplicado { get; set; }
 
-        public List<MembresiaXMiembro> MembresiasXMiembro { get; set; }
     }
 }

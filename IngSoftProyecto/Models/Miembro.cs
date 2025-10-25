@@ -2,7 +2,6 @@
 {
     public class Miembro:Persona
     {
-        public int MiembroId { get; set; }
         public required int TipoDeMiembroId { get; set; }
         public TipoDeMiembro TipoDeMiembro { get; set; }
         public int? EntrenadorId { get; set; }

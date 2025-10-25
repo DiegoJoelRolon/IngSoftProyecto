@@ -5,7 +5,14 @@ namespace IngSoftProyecto.Mapper
 {
     public class MiembroMapper
     {
-        private readonly TipoDeMiembroMapper _tipoDeMiembroMapper = new TipoDeMiembroMapper();
+        private readonly EntrenadorMapper _entrenadorMapper;
+        private readonly TipoDeMiembroMapper _tipoDeMiembroMapper;
+        public MiembroMapper(EntrenadorMapper entrenadorMapper,TipoDeMiembroMapper tipoDeMiembroMapper)
+        {
+            _entrenadorMapper = entrenadorMapper;
+            _tipoDeMiembroMapper = tipoDeMiembroMapper;
+        }
+
         virtual public async Task<List<MiembroResponse>> GetAllMiembrosResponse(List<Miembro> miembros)
         {
             List<MiembroResponse> response = new List<MiembroResponse>();
@@ -20,8 +27,11 @@ namespace IngSoftProyecto.Mapper
         {
             MiembroResponse response = new MiembroResponse
             {
+
+                Id = miembro.Id,
                 TipoDeMiembroId = miembro.TipoDeMiembroId,
-                EntrenadorId = miembro.EntrenadorId,
+                Entrenador= miembro.Entrenador != null
+                     ? await _entrenadorMapper.GetEntrenadorResponse(miembro.Entrenador): null,
                 Nombre = miembro.Nombre,
                 Direccion = miembro.Direccion,
                 Telefono = miembro.Telefono,
