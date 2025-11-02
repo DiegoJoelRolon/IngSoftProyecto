@@ -51,6 +51,12 @@ namespace IngSoftProyecto.Services
             {
                 throw new BadRequestException("Descripcion no puede estar vacio");
             }
+
+            if (await _query.DescriptionExists(request.Descripcion, request.TipoDeMembresiaId))
+            {
+                throw new BadRequestException("Ya existe un tipo de membresía con esa descripción.");
+            }
+
             return true;
         }
     }

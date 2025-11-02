@@ -22,6 +22,12 @@ namespace IngSoftProyecto.CQRS.Commands
             await _context.SaveChangesAsync();
             return request;
         }
-        
+        virtual public async Task<Membresia> DeleteMembresia(Membresia request)
+        {
+            _context.Membresias.Remove(request);
+            await _context.SaveChangesAsync();
+            return request;
+        }
+
     }
 }

@@ -26,6 +26,7 @@ namespace IngSoftProyecto.Services
         }
         virtual public async Task<MembresiaXMiembroResponse> AddMembresiaXMiembro(MembresiaXMiembroRequest request)
         {
+           
             await CheckMembresiaXMiembroRequest(request);
             var membresiaXMiembro = new MembresiaXMiembro
             {
@@ -73,11 +74,11 @@ namespace IngSoftProyecto.Services
         }
         private async Task<bool> CheckMembresiaXMiembroRequest(MembresiaXMiembroRequest request)
         {
-            if (_miembroService.GetMiembroById(request.MiembroId)==null)
+            if (await _miembroService.GetMiembroById(request.MiembroId)==null)
             {
                 throw new BadRequestException("Id invalido en la solicitud de Miembro");
             }
-            if (_membresiaService.GetMembresiaById(request.MembresiaId)==null)
+            if (await _membresiaService.GetMembresiaById(request.MembresiaId)==null)
             {
                 throw new BadRequestException("Id invalido en la solicitud de Membresia");
             }
@@ -85,13 +86,37 @@ namespace IngSoftProyecto.Services
             {
                 throw new BadRequestException("Id invalido en la solicitud de EstadoMembresia");
             }
-            if (_pagoService.GetPagoById(request.PagoId)==null)
+            if (await _pagoService.GetPagoById(request.PagoId)==null)
             {
                 throw new BadRequestException("Id invalido en la solicitud de Pago");
             }
             if (request.FechaFin <= request.FechaInicio)
             {
                 throw new BadRequestException("Fechas invalidas en la solicitud de MembresiaXMiembro");
+            }
+
+            if (request.PagoId == 0) 
+            {
+                throw new BadRequestException("El PagoId es obligatorio. La membresía debe pagarse por adelantado.");
+            }
+
+            var pago = await _pagoService.GetPagoById(request.PagoId);
+            if (pago == null)
+            {
+                throw new NotFoundException("Pago no encontrado.");
+            }
+
+            if (request.FechaFin <= request.FechaInicio)
+            {
+                throw new BadRequestException("La FechaFin debe ser posterior a la FechaInicio.");
+            }
+
+            var membresia = await _membresiaService.GetMembresiaById(request.MembresiaId);
+            TimeSpan duracionReal = request.FechaFin - request.FechaInicio;
+
+            if (duracionReal.TotalDays != membresia.DuracionEnDias)
+            {
+                throw new BadRequestException($"Duración incorrecta. La membresía seleccionada dura {membresia.DuracionEnDias} días.");
             }
 
             return true;

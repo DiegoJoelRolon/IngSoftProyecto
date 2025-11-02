@@ -7,9 +7,11 @@ namespace IngSoftProyecto.Mapper
         private readonly EntrenadorMapper _entrenadorMapper;
         private readonly ActividadMapper _actividadMapper;
 
-        public ClaseMapper(EntrenadorMapper entrenadorMapper)
+        public ClaseMapper(EntrenadorMapper entrenadorMapper, ActividadMapper actividadMapper)
         {
             _entrenadorMapper = entrenadorMapper;
+            _actividadMapper = actividadMapper;
+
         }
 
         public virtual async Task<List<ClaseResponse>> GetAllClasesResponse(List<Clase> clases)

@@ -5,6 +5,8 @@ using IngSoftProyecto.Mapper;
 using IngSoftProyecto.Models;
 using IngSoftProyecto.Models.DTOs.Request;
 using IngSoftProyecto.Models.DTOs.Response;
+using Microsoft.IdentityModel.Tokens;
+using System.Text.RegularExpressions;
 
 namespace IngSoftProyecto.Services
 {
@@ -14,13 +16,15 @@ namespace IngSoftProyecto.Services
         private readonly MiembroCommand _miembroCommand;
         private readonly TipoDeMiembroQuery _tipoDeMiembroQuery;
         private readonly MiembroMapper _miembroMapper;
+        private readonly EntrenadorService _entrenadorService;
 
-        public MiembroService(MiembroQuery miembroQuery, MiembroCommand miembroCommand, MiembroMapper miembroMapper, TipoDeMiembroQuery tipoDeMiembroQuery, TipoDeMiembroCommand tipoDeMiembroCommand, TipoDeMiembroMapper tipoDeMiembroMapper)
+        public MiembroService(MiembroQuery miembroQuery, MiembroCommand miembroCommand, MiembroMapper miembroMapper, TipoDeMiembroQuery tipoDeMiembroQuery, TipoDeMiembroCommand tipoDeMiembroCommand, TipoDeMiembroMapper tipoDeMiembroMapper,EntrenadorService entrenadorService)
         {
             _miembroQuery = miembroQuery;
             _miembroCommand = miembroCommand;
             _tipoDeMiembroQuery = tipoDeMiembroQuery;
             _miembroMapper = miembroMapper;
+            _entrenadorService = entrenadorService;
         }
         public virtual async Task<List<MiembroResponse>> GetAllMiembros()
         {
@@ -58,7 +62,7 @@ namespace IngSoftProyecto.Services
         public virtual async Task<MiembroResponse> UpdateMiembro(int id, MiembroRequest request)
         {
             await MiembroExists(id);
-            await CheckMiembroRequest(request);
+            await CheckMiembroRequest(request,id);
 
             var miembro = await _miembroQuery.GetMiembroById(id);
             miembro.DNI= request.DNI;
@@ -100,7 +104,7 @@ namespace IngSoftProyecto.Services
                 throw new NotFoundException("Id de miembro invalido");
             return true;
         }
-        public async Task<bool> CheckMiembroRequest(MiembroRequest request)
+        public async Task<bool> CheckMiembroRequest(MiembroRequest request, int? miembroId = null)
         {
             if (await _tipoDeMiembroQuery.GetTipoDeMiembroById(request.TipoDeMiembroId) == null)
                 throw new NotFoundException("Tipo de miembro no encontrado");
@@ -116,6 +120,37 @@ namespace IngSoftProyecto.Services
                 throw new BadRequestException("Email invalido");
             if (string.IsNullOrEmpty(request.Foto) || string.IsNullOrWhiteSpace(request.Foto))
                 throw new BadRequestException("Foto invalida");
+
+            // Validar DNI
+            if (string.IsNullOrEmpty(request.DNI.ToString()) || string.IsNullOrWhiteSpace(request.DNI.ToString()))
+                throw new BadRequestException("DNI es obligatorio.");
+            // 1. NUEVA VALIDACIÓN: Unicidad del DNI
+            if (await _miembroQuery.MiembroExistsByDNI(request.DNI, miembroId))
+                throw new BadRequestException("El DNI ya se encuentra registrado para otro miembro.");
+
+            // Validar Email (Tu validación de formato ya existe, solo agregamos la unicidad)
+            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrWhiteSpace(request.Email) || !request.Email.Contains("@") || !request.Email.ToLower().Contains("."))
+                throw new BadRequestException("Email inválido o formato incorrecto.");
+            // 2. NUEVA VALIDACIÓN: Unicidad del Email
+            if (await _miembroQuery.MiembroExistsByEmail(request.Email, miembroId))
+                throw new BadRequestException("El Email ya se encuentra registrado para otro miembro.");
+
+            if (request.EntrenadorId.HasValue && request.EntrenadorId.Value > 0)
+            {
+                if (await _entrenadorService.GetEntrenadorById(request.EntrenadorId.Value) == null)
+                {
+                    throw new NotFoundException("El EntrenadorId especificado no existe.");
+                }
+            }
+
+            if (!Regex.IsMatch(request.DNI.ToString(), @"^\d+$"))
+                throw new BadRequestException("DNI debe contener solo números.");
+
+            // ...
+
+            // 5. NUEVA VALIDACIÓN: Formato de Teléfono (Ejemplo: solo números y un largo mínimo/máximo)
+            if (!Regex.IsMatch(request.Telefono, @"^\d{8,15}$")) // Ajustar la regex a tu formato local (ej: 8 a 15 dígitos)
+                throw new BadRequestException("Teléfono inválido. Solo se permiten entre 8 y 15 dígitos.");
             return true;
 
 

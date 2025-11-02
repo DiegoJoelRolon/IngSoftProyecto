@@ -68,11 +68,11 @@ namespace IngSoftProyecto.Services
         }
         private async Task CheckMiembroXClaseRequest(MiembroXClaseRequest request)
         {
-            if (_miembroService.GetMiembroById(request.MiembroId)==null)
+            if (await _miembroService.GetMiembroById(request.MiembroId)==null)
             {
                 throw new BadRequestException("Id de Miembro invalido");
             }
-            if (_claseService.GetClaseById(request.ClaseId)==null)
+            if (await _claseService.GetClaseById(request.ClaseId)==null)
             {
                 throw new BadRequestException("Id de Clase invalido");
             }

@@ -1,4 +1,7 @@
-﻿using IngSoftProyecto.CQRS.Commands;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using IngSoftProyecto.CQRS.Commands;
 using IngSoftProyecto.CQRS.Queries;
 using IngSoftProyecto.Exceptions;
 using IngSoftProyecto.Mapper;
@@ -7,23 +10,39 @@ using IngSoftProyecto.Models.DTOs.Request;
 using IngSoftProyecto.Models.DTOs.Response;
 using IngSoftProyecto.Services;
 using Moq;
+using Xunit;
 
 namespace Tests
 {
     public class MiembroServiceTests
     {
-        //**********************************************GetAllMiembros
+        //********************************************** GetAllMiembros
         [Fact]
         public async Task GetAllMiembros_ReturnsList()
         {
             var miembroQuery = new Mock<MiembroQuery>(null);
             var miembroCommand = new Mock<MiembroCommand>(null);
             var tipoDeMiembroQuery = new Mock<TipoDeMiembroQuery>(null);
-            var miembroMapper = new Mock<MiembroMapper>();
+            var tipoDeMiembroCommand = new Mock<TipoDeMiembroCommand>(null);
+
+            var entrenadorMapper = new EntrenadorMapper();
+            var tipoDeMiembroMapper = new TipoDeMiembroMapper();
+            var miembroMapper = new MiembroMapper(entrenadorMapper, tipoDeMiembroMapper);
+
+            var entrenadorService = new Mock<EntrenadorService>(null, null, entrenadorMapper);
+
             miembroQuery.Setup(q => q.GetAllMiembros()).ReturnsAsync(new List<Miembro>());
-            miembroMapper.Setup(m => m.GetAllMiembrosResponse(It.IsAny<List<Miembro>>()))
-                .ReturnsAsync(new List<MiembroResponse>());
-            var service = new MiembroService(miembroQuery.Object, miembroCommand.Object, miembroMapper.Object, tipoDeMiembroQuery.Object, null, null);
+
+            var service = new MiembroService(
+                miembroQuery.Object,
+                miembroCommand.Object,
+                miembroMapper,
+                tipoDeMiembroQuery.Object,
+                tipoDeMiembroCommand.Object,
+                tipoDeMiembroMapper,
+                entrenadorService.Object
+
+            );
 
             var result = await service.GetAllMiembros();
 
@@ -31,323 +50,293 @@ namespace Tests
             Assert.IsType<List<MiembroResponse>>(result);
         }
 
-        //************************************************GetMiembroById
+        //********************************************** GetMiembroById
         [Fact]
-        public async Task GetMiembroById_ReturnsMiembroResponse_WhenIdIsValid()
+        public async Task GetMiembroById_ReturnsResponse_WhenIdIsValid()
         {
-
             var miembroQuery = new Mock<MiembroQuery>(null);
             var miembroCommand = new Mock<MiembroCommand>(null);
             var tipoDeMiembroQuery = new Mock<TipoDeMiembroQuery>(null);
-            var miembroMapper = new Mock<MiembroMapper>();
+            var tipoDeMiembroCommand = new Mock<TipoDeMiembroCommand>(null);
+            var entrenadorMapper = new EntrenadorMapper();
+            var tipoDeMiembroMapper = new TipoDeMiembroMapper();
+            var miembroMapper = new MiembroMapper(entrenadorMapper, tipoDeMiembroMapper);
 
-            var tipoDeMiembro = new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "desc", PorcentajeDescuento = 10 };
+            var entrenadorService = new Mock<EntrenadorService>(null, null, entrenadorMapper);
+            
+
+            var tipoDeMiembro = new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "Premium", PorcentajeDescuento = 10 };
+
             var miembro = new Miembro
             {
                 Id = 1,
                 DNI = 12345678,
                 TipoDeMiembroId = 1,
-                EntrenadorId = 2,
+                TipoDeMiembro = tipoDeMiembro,
                 Nombre = "Juan",
                 Direccion = "Calle Falsa 123",
                 Telefono = "555-1234",
-                FechaNacimiento = DateTime.Now.AddYears(-30),
-                TipoDeMiembro = tipoDeMiembro,
+                FechaNacimiento = new DateTime(1995, 3, 10),
                 Email = "juan@test.com",
-                Foto = "foto.jpg",
+                Foto = "juan.jpg",
                 Eliminado = false
-            };
-            var miembroResponse = new MiembroResponse
-            {
-                TipoDeMiembroId = miembro.TipoDeMiembroId,
-                EntrenadorId = miembro.EntrenadorId,
-                Nombre = miembro.Nombre,
-                Direccion = miembro.Direccion,
-                Telefono = miembro.Telefono,
-                FechaNacimiento = miembro.FechaNacimiento,
-                TipoDeMiembro = new TipoDeMiembroResponse
-                {
-                    Descripcion = tipoDeMiembro.Descripcion,
-                    PorcentajeDescuento = tipoDeMiembro.PorcentajeDescuento
-                },
-                Email = miembro.Email,
-                Foto = miembro.Foto,
-                Eliminado = miembro.Eliminado
             };
 
             miembroQuery.Setup(q => q.GetMiembroById(1)).ReturnsAsync(miembro);
-            miembroMapper.Setup(m => m.GetMiembroResponse(miembro)).ReturnsAsync(miembroResponse);
 
-            var service = new MiembroService(miembroQuery.Object, miembroCommand.Object, miembroMapper.Object, tipoDeMiembroQuery.Object, null, null);
+            var service = new MiembroService(
+                miembroQuery.Object,
+                miembroCommand.Object,
+                miembroMapper,
+                tipoDeMiembroQuery.Object,
+                tipoDeMiembroCommand.Object,
+                tipoDeMiembroMapper,
+                entrenadorService.Object
+
+            );
 
             var result = await service.GetMiembroById(1);
 
-
             Assert.NotNull(result);
             Assert.IsType<MiembroResponse>(result);
-            Assert.Equal(miembro.Nombre, result.Nombre);
+            Assert.Equal("Juan", result.Nombre);
         }
-
 
         [Fact]
         public async Task GetMiembroById_ThrowsNotFoundException_WhenIdInvalid()
         {
             var miembroQuery = new Mock<MiembroQuery>(null);
+            miembroQuery.Setup(q => q.GetMiembroById(It.IsAny<int>())).ReturnsAsync((Miembro?)null);
+
             var miembroCommand = new Mock<MiembroCommand>(null);
             var tipoDeMiembroQuery = new Mock<TipoDeMiembroQuery>(null);
-            var miembroMapper = new Mock<MiembroMapper>();
-            miembroQuery.Setup(q => q.GetMiembroById(It.IsAny<int>())).ReturnsAsync((Miembro)null);
-            var service = new MiembroService(miembroQuery.Object, miembroCommand.Object, miembroMapper.Object, tipoDeMiembroQuery.Object, null, null);
 
-            await Assert.ThrowsAsync<NotFoundException>(() => service.GetMiembroById(0));
+            var entrenadorMapper = new EntrenadorMapper();
+            var tipoDeMiembroMapper = new TipoDeMiembroMapper();
+            var miembroMapper = new MiembroMapper(entrenadorMapper, tipoDeMiembroMapper);
+
+            var service = new MiembroService(
+                miembroQuery.Object,
+                miembroCommand.Object,
+                miembroMapper,
+                tipoDeMiembroQuery.Object,
+                null,
+                null,
+                null
+            );
+
+            var ex = await Assert.ThrowsAsync<NotFoundException>(() => service.GetMiembroById(0));
+            Assert.Equal("Id de miembro invalido", ex.Message);
         }
 
-        //*********************************************************AddMiembro
+        //********************************************** AddMiembro
         [Fact]
-        public async Task AddMiembro_ReturnsMiembroResponse_WhenRequestIsValid()
+        public async Task AddMiembro_ReturnsResponse_WhenRequestIsValid()
         {
-            // Arrange
             var miembroQuery = new Mock<MiembroQuery>(null);
             var miembroCommand = new Mock<MiembroCommand>(null);
             var tipoDeMiembroQuery = new Mock<TipoDeMiembroQuery>(null);
-            var miembroMapper = new Mock<MiembroMapper>();
+            var tipoDeMiembroCommand = new Mock<TipoDeMiembroCommand>(null);
 
-            var tipoDeMiembro = new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "desc", PorcentajeDescuento = 10 };
-            var miembro = new Miembro
+            var entrenadorMapper = new EntrenadorMapper();
+            var tipoDeMiembroMapper = new TipoDeMiembroMapper();
+            var miembroMapper = new MiembroMapper(entrenadorMapper, tipoDeMiembroMapper);
+
+            var entrenadorService = new Mock<EntrenadorService>(null, null, entrenadorMapper);
+
+            var tipoDeMiembro = new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "Básico", PorcentajeDescuento = 5 };
+            tipoDeMiembroQuery.Setup(q => q.GetTipoDeMiembroById(1)).ReturnsAsync(tipoDeMiembro);
+
+            var added = new Miembro {
+                Id = 1,
+                Nombre = "Lucia",
+                DNI = 87654321,
+                FechaNacimiento = new DateTime(1992, 7, 15),
+                Telefono = "12345678",
+                Direccion = "Av. Secundaria 2",
+                Email = "lucia@example.com",
+                Foto = "lucia.jpg",
+                Eliminado = false,
+                TipoDeMiembroId = 1,
+            };
+
+            var fetched = new Miembro
             {
                 Id = 1,
-                DNI= 123454678,
+                DNI = 12345678,
+                Nombre = "Carlos",
                 TipoDeMiembroId = 1,
-                EntrenadorId = 2,
-                Nombre = "Juan",
-                Direccion = "Calle Falsa 123",
-                Telefono = "555-1234",
-                FechaNacimiento = DateTime.Now.AddYears(-30),
                 TipoDeMiembro = tipoDeMiembro,
-                Email = "juan@test.com",
+                Email = "carlos@test.com",
+                Direccion = "Calle Luna 45",
+                Telefono = "12345678",
+                FechaNacimiento = new DateTime(1990, 5, 15),
                 Foto = "foto.jpg",
                 Eliminado = false
             };
-            var miembroResponse = new MiembroResponse
-            {
-                TipoDeMiembroId = miembro.TipoDeMiembroId,
-                EntrenadorId = miembro.EntrenadorId,
-                Nombre = miembro.Nombre,
-                Direccion = miembro.Direccion,
-                Telefono = miembro.Telefono,
-                FechaNacimiento = miembro.FechaNacimiento,
-                TipoDeMiembro = new TipoDeMiembroResponse
-                {
-                    Descripcion = tipoDeMiembro.Descripcion,
-                    PorcentajeDescuento = tipoDeMiembro.PorcentajeDescuento
-                },
-                Email = miembro.Email,
-                Foto = miembro.Foto,
-                Eliminado = miembro.Eliminado
-            };
+
+            miembroCommand.Setup(c => c.AddMiembro(It.IsAny<Miembro>())).ReturnsAsync(added);
+            miembroQuery.Setup(q => q.GetMiembroById(1)).ReturnsAsync(fetched);
+
+            var service = new MiembroService(
+                miembroQuery.Object,
+                miembroCommand.Object,
+                miembroMapper,
+                tipoDeMiembroQuery.Object,
+                tipoDeMiembroCommand.Object,
+                tipoDeMiembroMapper,
+                entrenadorService.Object
+            );
 
             var request = new MiembroRequest
             {
                 TipoDeMiembroId = 1,
-                DNI= 123454678,
-                EntrenadorId = 2,
-                Nombre = "Juan",
-                Direccion = "Calle Falsa 123",
-                Telefono = "555-1234",
-                FechaNacimiento = DateTime.Now.AddYears(-30),
-                Email = "juan@test.com",
+                DNI = 12345678,
+                Nombre = "Carlos",
+                Direccion = "Calle Luna 45",
+                Telefono = "12345678",
+                FechaNacimiento = new DateTime(1990, 5, 15),
+                Email = "carlos@test.com",
                 Foto = "foto.jpg"
             };
 
-            tipoDeMiembroQuery.Setup(q => q.GetTipoDeMiembroById(1)).ReturnsAsync(tipoDeMiembro);
-            miembroCommand.Setup(c => c.AddMiembro(It.IsAny<Miembro>())).ReturnsAsync(miembro);
-            miembroQuery.Setup(q => q.GetMiembroById(1)).ReturnsAsync(miembro);
-            miembroMapper.Setup(m => m.GetMiembroResponse(miembro)).ReturnsAsync(miembroResponse);
-
-            var service = new MiembroService(miembroQuery.Object, miembroCommand.Object, miembroMapper.Object, tipoDeMiembroQuery.Object, null, null);
-
-            // Act
             var result = await service.AddMiembro(request);
 
-            // Assert
             Assert.NotNull(result);
             Assert.IsType<MiembroResponse>(result);
-            Assert.Equal(request.Nombre, result.Nombre);
+            Assert.Equal("Carlos", result.Nombre);
         }
-
-
-        [Theory]
-        [InlineData(1, null, "123", "2000-01-01", "test@test.com", "foto", "Nombre")]
-        [InlineData(1, "dir", null, "2000-01-01", "test@test.com", "foto", "Telefono")]
-        [InlineData(1, "dir", "123", "2027-01-01", "test@test.com", "foto", "FechaNacimiento")] // Futuro
-        [InlineData(1, "dir", "123", "2000-01-01", null, "foto", "Email")]
-        [InlineData(1, "dir", "123", "2000-01-01", "test@test.com", null, "Foto")]
-        public async Task AddMiembro_ThrowsBadRequestException_WhenInvalidFields(
-            int? tipoDeMiembroId,
-            string nombre,
-            string telefono,
-            string fechaNacimientoStr,
-            string email,
-            string foto,
-            string expectedInvalidField)
-        {
-            // Arrange
-            var miembroQuery = new Mock<MiembroQuery>(null);
-            var miembroCommand = new Mock<MiembroCommand>(null);
-            var tipoDeMiembroQuery = new Mock<TipoDeMiembroQuery>(null);
-            var miembroMapper = new Mock<MiembroMapper>();
-
-            tipoDeMiembroQuery.Setup(q => q.GetTipoDeMiembroById(It.IsAny<int>()))
-                .ReturnsAsync(new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "desc", PorcentajeDescuento = 0 });
-
-            var service = new MiembroService(miembroQuery.Object, miembroCommand.Object, miembroMapper.Object, tipoDeMiembroQuery.Object, null, null);
-
-            var fechaNacimiento = DateTime.Parse(fechaNacimientoStr);
-
-            var request = new MiembroRequest
-            {
-                TipoDeMiembroId = tipoDeMiembroId.HasValue ? tipoDeMiembroId.Value : 1,
-                DNI= 12345678,
-                Nombre = nombre,
-                Direccion = "dir",
-                Telefono = telefono,
-                FechaNacimiento = fechaNacimiento,
-                Email = email,
-                Foto = foto
-            };
-
-            // Act & Assert
-            var exception = await Assert.ThrowsAsync<BadRequestException>(() => service.AddMiembro(request));
-
-            Assert.Contains(expectedInvalidField, exception.Message, StringComparison.OrdinalIgnoreCase);
-        }
-
 
         [Fact]
-        public async Task AddMiembro_ThrowsNotFoundException_WhenTipoDeMiembroIdIsInvalid()
+        public async Task AddMiembro_ThrowsNotFoundException_WhenTipoDeMiembroInvalid()
         {
             var miembroQuery = new Mock<MiembroQuery>(null);
             var miembroCommand = new Mock<MiembroCommand>(null);
             var tipoDeMiembroQuery = new Mock<TipoDeMiembroQuery>(null);
-            var miembroMapper = new Mock<MiembroMapper>();
 
-            tipoDeMiembroQuery
-                .Setup(q => q.GetTipoDeMiembroById(It.Is<int>(id => id == 9999)))
-                .ReturnsAsync((TipoDeMiembro)null);
+            tipoDeMiembroQuery.Setup(q => q.GetTipoDeMiembroById(It.IsAny<int>())).ReturnsAsync((TipoDeMiembro?)null);
 
-            tipoDeMiembroQuery
-                .Setup(q => q.GetTipoDeMiembroById(It.Is<int>(id => id != 9999)))
-                .ReturnsAsync(new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "desc", PorcentajeDescuento = 0 });
-
-            var service = new MiembroService(miembroQuery.Object, miembroCommand.Object, miembroMapper.Object, tipoDeMiembroQuery.Object, null, null);
+            var miembroMapper = new MiembroMapper(new EntrenadorMapper(), new TipoDeMiembroMapper());
+            var service = new MiembroService(
+                miembroQuery.Object,
+                miembroCommand.Object,
+                miembroMapper,
+                tipoDeMiembroQuery.Object,
+                null,
+                null,
+                null
+            );
 
             var request = new MiembroRequest
             {
-                TipoDeMiembroId = 9999,
+                TipoDeMiembroId = 999,
                 DNI = 12345678,
-                Nombre = "test",
-                Direccion = "dir",
-                Telefono = "123",
-                FechaNacimiento = DateTime.Now.AddYears(-20),
-                Email = "test@test.com",
-                Foto = "foto"
+                Nombre = "Juan",
+                Direccion = "Calle",
+                Telefono = "12345678",
+                FechaNacimiento = DateTime.Today.AddYears(-20),
+                Email = "juan@test.com",
+                Foto = "foto.jpg"
             };
 
             await Assert.ThrowsAsync<NotFoundException>(() => service.AddMiembro(request));
         }
 
-        //************************************************UpdateMiembro
-
+        //********************************************** UpdateMiembro
         [Fact]
-        public async Task UpdateMiembro_ReturnsMiembroResponse_WhenRequestIsValid()
+        public async Task UpdateMiembro_ReturnsResponse_WhenRequestIsValid()
         {
             var miembroQuery = new Mock<MiembroQuery>(null);
             var miembroCommand = new Mock<MiembroCommand>(null);
             var tipoDeMiembroQuery = new Mock<TipoDeMiembroQuery>(null);
-            var miembroMapper = new Mock<MiembroMapper>();
 
-            var tipoDeMiembro = new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "desc", PorcentajeDescuento = 10 };
-            var miembro = new Miembro
+            var entrenadorMapper = new EntrenadorMapper();
+            var tipoDeMiembroMapper = new TipoDeMiembroMapper();
+            var miembroMapper = new MiembroMapper(entrenadorMapper, tipoDeMiembroMapper);
+
+            var tipoDeMiembro = new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "Premium", PorcentajeDescuento = 10 };
+
+            var existing = new Miembro
             {
                 Id = 1,
-                TipoDeMiembroId = 1,
                 DNI = 12345678,
-                EntrenadorId = 2,
-                Nombre = "Juan",
-                Direccion = "Calle Falsa 123",
-                Telefono = "555-1234",
-                FechaNacimiento = DateTime.Now.AddYears(-30),
+                TipoDeMiembroId = 1,
                 TipoDeMiembro = tipoDeMiembro,
+                Nombre = "Juan",
+                Direccion = "Calle 1",
+                Telefono = "12345678",
+                FechaNacimiento = new DateTime(1990, 1, 1),
                 Email = "juan@test.com",
-                Foto = "foto.jpg",
-                Eliminado = false
-            };
-            var miembroResponse = new MiembroResponse
-            {
-                TipoDeMiembroId = miembro.TipoDeMiembroId,
-                EntrenadorId = miembro.EntrenadorId,
-                Nombre = miembro.Nombre,
-                Direccion = miembro.Direccion,
-                Telefono = miembro.Telefono,
-                FechaNacimiento = miembro.FechaNacimiento,
-                TipoDeMiembro = new TipoDeMiembroResponse
-                {
-                    Descripcion = tipoDeMiembro.Descripcion,
-                    PorcentajeDescuento = tipoDeMiembro.PorcentajeDescuento
-                },
-                Email = miembro.Email,
-                Foto = miembro.Foto,
-                Eliminado = miembro.Eliminado
+                Foto = "foto.jpg"
             };
 
-            var request = new MiembroRequest
+            var updated = new Miembro
             {
-                TipoDeMiembroId = 1,
+                Id = 1,
                 DNI = 12345678,
-                EntrenadorId = 2,
-                Nombre = "Juan",
-                Direccion = "Calle Falsa 123",
-                Telefono = "555-1234",
-                FechaNacimiento = DateTime.Now.AddYears(-30),
+                TipoDeMiembroId = 1,
+                TipoDeMiembro = tipoDeMiembro,
+                Nombre = "Juan Actualizado",
+                Direccion = "Calle 2",
+                Telefono = "12345678",
+                FechaNacimiento = existing.FechaNacimiento,
                 Email = "juan@test.com",
                 Foto = "foto.jpg"
             };
 
             tipoDeMiembroQuery.Setup(q => q.GetTipoDeMiembroById(1)).ReturnsAsync(tipoDeMiembro);
-            miembroQuery.Setup(q => q.GetMiembroById(1)).ReturnsAsync(miembro);
-            miembroCommand.Setup(c => c.UpdateMiembro(It.IsAny<Miembro>())).ReturnsAsync(miembro);
-            miembroMapper.Setup(m => m.GetMiembroResponse(miembro)).ReturnsAsync(miembroResponse);
+            miembroQuery.SetupSequence(q => q.GetMiembroById(1))
+                .ReturnsAsync(existing) // Llamada 1: Lee la entidad existente
+                .ReturnsAsync(updated)  // Llamada 2: Lee la entidad actualizada después del comando
+                .ReturnsAsync(updated);
 
-            var service = new MiembroService(miembroQuery.Object, miembroCommand.Object, miembroMapper.Object, tipoDeMiembroQuery.Object, null, null);
+            miembroCommand.Setup(c => c.UpdateMiembro(It.IsAny<Miembro>())).ReturnsAsync(updated);
 
-            var result = await service.UpdateMiembro(1, request);
-
-            Assert.NotNull(result);
-            Assert.IsType<MiembroResponse>(result);
-            Assert.Equal(request.Nombre, result.Nombre);
-        }
-
-        [Fact]
-        public async Task UpdateMiembro_ThrowsNotFoundException_WhenIdIsInvalid()
-        {
-            var miembroQuery = new Mock<MiembroQuery>(null);
-            var miembroCommand = new Mock<MiembroCommand>(null);
-            var tipoDeMiembroQuery = new Mock<TipoDeMiembroQuery>(null);
-            var miembroMapper = new Mock<MiembroMapper>();
-
-            miembroQuery.Setup(q => q.GetMiembroById(It.IsAny<int>())).ReturnsAsync((Miembro)null);
-
-            var service = new MiembroService(miembroQuery.Object, miembroCommand.Object, miembroMapper.Object, tipoDeMiembroQuery.Object, null, null);
+            var service = new MiembroService(
+                miembroQuery.Object,
+                miembroCommand.Object,
+                miembroMapper,
+                tipoDeMiembroQuery.Object,
+                null,
+                null,
+                null
+            );
 
             var request = new MiembroRequest
             {
                 TipoDeMiembroId = 1,
                 DNI = 12345678,
-                EntrenadorId = 2,
+                Nombre = "Juan Actualizado",
+                Direccion = "Calle 2",
+                Telefono = "12345678",
+                FechaNacimiento = new DateTime(1990, 1, 1),
+                Email = "juan@test.com",
+                Foto = "foto.jpg"
+            };
+
+            var result = await service.UpdateMiembro(1, request);
+
+            Assert.NotNull(result);
+            Assert.Equal("Juan Actualizado", result.Nombre);
+        }
+
+        [Fact]
+        public async Task UpdateMiembro_ThrowsNotFoundException_WhenIdInvalid()
+        {
+            var miembroQuery = new Mock<MiembroQuery>(null);
+            miembroQuery.Setup(q => q.GetMiembroById(It.IsAny<int>())).ReturnsAsync((Miembro?)null);
+
+            var miembroMapper = new MiembroMapper(new EntrenadorMapper(), new TipoDeMiembroMapper());
+            var service = new MiembroService(miembroQuery.Object, null, miembroMapper, null, null, null,null);
+
+            var request = new MiembroRequest
+            {
+                TipoDeMiembroId = 1,
+                DNI = 12345678,
                 Nombre = "Juan",
-                Direccion = "Calle Falsa 123",
-                Telefono = "555-1234",
-                FechaNacimiento = DateTime.Now.AddYears(-30),
+                Direccion = "Calle 1",
+                Telefono = "12345678",
+                FechaNacimiento = DateTime.Today.AddYears(-20),
                 Email = "juan@test.com",
                 Foto = "foto.jpg"
             };
@@ -355,181 +344,49 @@ namespace Tests
             await Assert.ThrowsAsync<NotFoundException>(() => service.UpdateMiembro(999, request));
         }
 
+        //********************************************** DeleteMiembro
         [Fact]
-        public async Task UpdateMiembro_ThrowsNotFoundException_WhenTipoDeMiembroIdIsInvalid()
+        public async Task DeleteMiembro_ReturnsResponse_WhenIdIsValid()
         {
             var miembroQuery = new Mock<MiembroQuery>(null);
             var miembroCommand = new Mock<MiembroCommand>(null);
-            var tipoDeMiembroQuery = new Mock<TipoDeMiembroQuery>(null);
-            var miembroMapper = new Mock<MiembroMapper>();
 
-            var miembroExistente = new Miembro
-            {
-                Id = 1,
-                TipoDeMiembroId = 1,
-                EntrenadorId = 2,
-                DNI = 12345678,
-                Nombre = "Juan",
-                Direccion = "Calle Falsa 123",
-                Telefono = "555-1234",
-                FechaNacimiento = DateTime.Now.AddYears(-30),
-                TipoDeMiembro = new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "desc", PorcentajeDescuento = 10 },
-                Email = "juan@test.com",
-                Foto = "foto.jpg",
-                Eliminado = false
-            };
-
-            miembroQuery.Setup(q => q.GetMiembroById(1)).ReturnsAsync(miembroExistente);
-
-            tipoDeMiembroQuery
-                .Setup(q => q.GetTipoDeMiembroById(It.Is<int>(id => id == 9999)))
-                .ReturnsAsync((TipoDeMiembro)null);
-
-            var service = new MiembroService(miembroQuery.Object, miembroCommand.Object, miembroMapper.Object, tipoDeMiembroQuery.Object, null, null);
-
-            var request = new MiembroRequest
-            {
-                TipoDeMiembroId = 9999,
-                EntrenadorId = 2,
-                DNI = 12345678,
-                Nombre = "Juan",
-                Direccion = "Calle Falsa 123",
-                Telefono = "555-1234",
-                FechaNacimiento = DateTime.Now.AddYears(-30),
-                Email = "juan@test.com",
-                Foto = "foto.jpg"
-            };
-
-            await Assert.ThrowsAsync<NotFoundException>(() => service.UpdateMiembro(1, request));
-        }
-
-        [Theory]
-        [InlineData(1, null, "555-1234", "2000-01-01", "juan@test.com", "foto.jpg", "Nombre")]
-        [InlineData(1, "Juan", null, "2000-01-01", "juan@test.com", "foto.jpg", "Telefono")]
-        [InlineData(1, "Juan", "555-1234", "2027-01-01", "juan@test.com", "foto.jpg", "FechaNacimiento")]
-        [InlineData(1, "Juan", "555-1234", "2000-01-01", null, "foto.jpg", "Email")]
-        [InlineData(1, "Juan", "555-1234", "2000-01-01", "juan@test.com", null, "Foto")]
-        public async Task UpdateMiembro_ThrowsBadRequestException_WhenInvalidFields(
-            int? tipoDeMiembroId,
-            string nombre,
-            string telefono,
-            string fechaNacimientoStr,
-            string email,
-            string foto,
-            string expectedInvalidField)
-        {
-            var miembroQuery = new Mock<MiembroQuery>(null);
-            var miembroCommand = new Mock<MiembroCommand>(null);
-            var tipoDeMiembroQuery = new Mock<TipoDeMiembroQuery>(null);
-            var miembroMapper = new Mock<MiembroMapper>();
-
-            tipoDeMiembroQuery.Setup(q => q.GetTipoDeMiembroById(It.IsAny<int>()))
-                .ReturnsAsync(new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "desc", PorcentajeDescuento = 0 });
-
-            var miembro = new Miembro
-            {
-                Id = 1,
-                DNI = 12345678,
-                TipoDeMiembroId = 1,
-                EntrenadorId = 2,
-                Nombre = "Juan",
-                Direccion = "Calle Falsa 123",
-                Telefono = "555-1234",
-                FechaNacimiento = DateTime.Now.AddYears(-30),
-                TipoDeMiembro = new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "desc", PorcentajeDescuento = 10 },
-                Email = "juan@test.com",
-                Foto = "foto.jpg",
-                Eliminado = false
-            };
-
-            miembroQuery.Setup(q => q.GetMiembroById(1)).ReturnsAsync(miembro);
-
-            var service = new MiembroService(miembroQuery.Object, miembroCommand.Object, miembroMapper.Object, tipoDeMiembroQuery.Object, null, null);
-
-            var fechaNacimiento = DateTime.Parse(fechaNacimientoStr);
-
-            var request = new MiembroRequest
-            {
-                TipoDeMiembroId = tipoDeMiembroId ?? 1,
-                Nombre = nombre,
-                DNI = 12345678,
-                Direccion = "Calle Falsa 123",
-                Telefono = telefono,
-                FechaNacimiento = fechaNacimiento,
-                Email = email,
-                Foto = foto
-            };
-
-            var exception = await Assert.ThrowsAsync<BadRequestException>(() => service.UpdateMiembro(1, request));
-            Assert.Contains(expectedInvalidField, exception.Message, StringComparison.OrdinalIgnoreCase);
-        }
-
-        //************************************************DeleteMiembro
-        [Fact]
-        public async Task DeleteMiembro_ReturnsMiembroResponse_WhenIdIsValid()
-        {
-            var miembroQuery = new Mock<MiembroQuery>(null);
-            var miembroCommand = new Mock<MiembroCommand>(null);
-            var tipoDeMiembroQuery = new Mock<TipoDeMiembroQuery>(null);
-            var miembroMapper = new Mock<MiembroMapper>();
+            var entrenadorMapper = new EntrenadorMapper();
+            var tipoDeMiembroMapper = new TipoDeMiembroMapper();
+            var miembroMapper = new MiembroMapper(entrenadorMapper, tipoDeMiembroMapper);
 
             var tipoDeMiembro = new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "desc", PorcentajeDescuento = 10 };
+
             var miembro = new Miembro
             {
-                Id = 1,
-                DNI = 12345678,
                 TipoDeMiembroId = 1,
-                EntrenadorId = 2,
+                DNI = 12345678,
                 Nombre = "Juan",
-                Direccion = "Calle Falsa 123",
-                Telefono = "555-1234",
-                FechaNacimiento = DateTime.Now.AddYears(-30),
-                TipoDeMiembro = tipoDeMiembro,
+                Direccion = "Calle 1",
+                Telefono = "12345678",
+                FechaNacimiento = DateTime.Today.AddYears(-20),
                 Email = "juan@test.com",
                 Foto = "foto.jpg",
+                Id = 1,
+                TipoDeMiembro = tipoDeMiembro,
                 Eliminado = false
             };
-            var miembroEliminado = new Miembro
-            {
-                Id = miembro.Id,
-                DNI = miembro.DNI,
-                TipoDeMiembroId = miembro.TipoDeMiembroId,
-                TipoDeMiembro = miembro.TipoDeMiembro,
-                EntrenadorId = miembro.EntrenadorId,
-                Entrenador = miembro.Entrenador,
-                Nombre = miembro.Nombre,
-                Direccion = miembro.Direccion,
-                Telefono = miembro.Telefono,
-                FechaNacimiento = miembro.FechaNacimiento,
-                Email = miembro.Email,
-                Foto = miembro.Foto,
-                Eliminado = true,
-                MembresiasXMiembros = miembro.MembresiasXMiembros,
-                MiembrosXClases = miembro.MiembrosXClases
-            };
-            var miembroResponse = new MiembroResponse
-            {
-                TipoDeMiembroId = miembro.TipoDeMiembroId,
-                EntrenadorId = miembro.EntrenadorId,
-                Nombre = miembro.Nombre,
-                Direccion = miembro.Direccion,
-                Telefono = miembro.Telefono,
-                FechaNacimiento = miembro.FechaNacimiento,
-                TipoDeMiembro = new TipoDeMiembroResponse
-                {
-                    Descripcion = tipoDeMiembro.Descripcion,
-                    PorcentajeDescuento = tipoDeMiembro.PorcentajeDescuento
-                },
-                Email = miembro.Email,
-                Foto = miembro.Foto,
-                Eliminado = true
-            };
+
+            var eliminado = miembro;
+            eliminado.Eliminado = true;
 
             miembroQuery.Setup(q => q.GetMiembroById(1)).ReturnsAsync(miembro);
-            miembroCommand.Setup(c => c.UpdateMiembro(It.IsAny<Miembro>())).ReturnsAsync(miembroEliminado);
-            miembroMapper.Setup(m => m.GetMiembroResponse(It.Is<Miembro>(m => m.Eliminado))).ReturnsAsync(miembroResponse);
+            miembroCommand.Setup(c => c.UpdateMiembro(It.IsAny<Miembro>())).ReturnsAsync(eliminado);
 
-            var service = new MiembroService(miembroQuery.Object, miembroCommand.Object, miembroMapper.Object, tipoDeMiembroQuery.Object, null, null);
+            var service = new MiembroService(
+                miembroQuery.Object,
+                miembroCommand.Object,
+                miembroMapper,
+                null,
+                null,
+                null,
+                null
+            );
 
             var result = await service.DeleteMiembro(1);
 
@@ -538,109 +395,15 @@ namespace Tests
         }
 
         [Fact]
-        public async Task DeleteMiembro_ThrowsNotFoundException_WhenIdIsInvalid()
+        public async Task DeleteMiembro_ThrowsNotFoundException_WhenIdInvalid()
         {
             var miembroQuery = new Mock<MiembroQuery>(null);
-            var miembroCommand = new Mock<MiembroCommand>(null);
-            var tipoDeMiembroQuery = new Mock<TipoDeMiembroQuery>(null);
-            var miembroMapper = new Mock<MiembroMapper>();
+            miembroQuery.Setup(q => q.GetMiembroById(It.IsAny<int>())).ReturnsAsync((Miembro?)null);
 
-            miembroQuery.Setup(q => q.GetMiembroById(It.IsAny<int>())).ReturnsAsync((Miembro)null);
-
-            var service = new MiembroService(miembroQuery.Object, miembroCommand.Object, miembroMapper.Object, tipoDeMiembroQuery.Object, null, null);
+            var miembroMapper = new MiembroMapper(new EntrenadorMapper(), new TipoDeMiembroMapper());
+            var service = new MiembroService(miembroQuery.Object, null, miembroMapper, null, null, null,null);
 
             await Assert.ThrowsAsync<NotFoundException>(() => service.DeleteMiembro(999));
         }
-
-
-        //************************************************RestoreMiembro
-        [Fact]
-        public async Task RestoreMiembro_ReturnsMiembroResponse_WhenIdIsValid()
-        {
-            var miembroQuery = new Mock<MiembroQuery>(null);
-            var miembroCommand = new Mock<MiembroCommand>(null);
-            var tipoDeMiembroQuery = new Mock<TipoDeMiembroQuery>(null);
-            var miembroMapper = new Mock<MiembroMapper>();
-
-            var tipoDeMiembro = new TipoDeMiembro { TipoDeMiembroId = 1, Descripcion = "desc", PorcentajeDescuento = 10 };
-            var miembro = new Miembro
-            {
-                Id = 1,
-                DNI = 12345678,
-                TipoDeMiembroId = 1,
-                EntrenadorId = 2,
-                Nombre = "Juan",
-                Direccion = "Calle Falsa 123",
-                Telefono = "555-1234",
-                FechaNacimiento = DateTime.Now.AddYears(-30),
-                TipoDeMiembro = tipoDeMiembro,
-                Email = "juan@test.com",
-                Foto = "foto.jpg",
-                Eliminado = true
-            };
-            var miembroRestaurado = new Miembro
-            {
-                Id = miembro.Id         ,
-                DNI = miembro.DNI,
-                TipoDeMiembroId = miembro.TipoDeMiembroId,
-                TipoDeMiembro = miembro.TipoDeMiembro,
-                EntrenadorId = miembro.EntrenadorId,
-                Entrenador = miembro.Entrenador,
-                Nombre = miembro.Nombre,
-                Direccion = miembro.Direccion,
-                Telefono = miembro.Telefono,
-                FechaNacimiento = miembro.FechaNacimiento,
-                Email = miembro.Email,
-                Foto = miembro.Foto,
-                Eliminado = false,
-                MembresiasXMiembros = miembro.MembresiasXMiembros,
-                MiembrosXClases = miembro.MiembrosXClases
-            };
-            var miembroResponse = new MiembroResponse
-            {
-                TipoDeMiembroId = miembro.TipoDeMiembroId,
-                EntrenadorId = miembro.EntrenadorId,
-                Nombre = miembro.Nombre,
-                Direccion = miembro.Direccion,
-                Telefono = miembro.Telefono,
-                FechaNacimiento = miembro.FechaNacimiento,
-                TipoDeMiembro = new TipoDeMiembroResponse
-                {
-                    Descripcion = tipoDeMiembro.Descripcion,
-                    PorcentajeDescuento = tipoDeMiembro.PorcentajeDescuento
-                },
-                Email = miembro.Email,
-                Foto = miembro.Foto,
-                Eliminado = false
-            };
-
-            miembroQuery.Setup(q => q.GetMiembroById(1)).ReturnsAsync(miembro);
-            miembroCommand.Setup(c => c.UpdateMiembro(It.IsAny<Miembro>())).ReturnsAsync(miembroRestaurado);
-            miembroMapper.Setup(m => m.GetMiembroResponse(It.Is<Miembro>(m => !m.Eliminado))).ReturnsAsync(miembroResponse);
-
-            var service = new MiembroService(miembroQuery.Object, miembroCommand.Object, miembroMapper.Object, tipoDeMiembroQuery.Object, null, null);
-
-            var result = await service.RestoreMiembro(1);
-
-            Assert.NotNull(result);
-            Assert.False(result.Eliminado);
-        }
-
-        [Fact]
-        public async Task RestoreMiembro_ThrowsNotFoundException_WhenIdIsInvalid()
-        {
-            var miembroQuery = new Mock<MiembroQuery>(null);
-            var miembroCommand = new Mock<MiembroCommand>(null);
-            var tipoDeMiembroQuery = new Mock<TipoDeMiembroQuery>(null);
-            var miembroMapper = new Mock<MiembroMapper>();
-
-            miembroQuery.Setup(q => q.GetMiembroById(It.IsAny<int>())).ReturnsAsync((Miembro)null);
-
-            var service = new MiembroService(miembroQuery.Object, miembroCommand.Object, miembroMapper.Object, tipoDeMiembroQuery.Object, null, null);
-
-            await Assert.ThrowsAsync<NotFoundException>(() => service.RestoreMiembro(999));
-        }
-
-
     }
 }
