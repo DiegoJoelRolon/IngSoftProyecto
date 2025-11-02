@@ -22,7 +22,7 @@ namespace Tests
             var qry = new Mock<AsistenciaQuery>(null);
             var tipoSvc = new Mock<TipoDeAsistenciaService>(null, null, null);
             var miembroXClaseSvc = new Mock<MiembroXClaseService>(null, null, null, null, null);
-            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null);
+            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null, null, null, null, null);
             var mapper = new Mock<AsistenciaMaper>(null, null, null);
 
             qry.Setup(q => q.GetAllAsistencias()).ReturnsAsync(new List<Asistencia>());
@@ -44,7 +44,7 @@ namespace Tests
             var qry = new Mock<AsistenciaQuery>(null);
             var tipoSvc = new Mock<TipoDeAsistenciaService>(null, null, null);
             var miembroXClaseSvc = new Mock<MiembroXClaseService>(null, null, null, null, null);
-            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null);
+            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null, null, null, null, null);
             var mapper = new Mock<AsistenciaMaper>(null, null, null);
 
             var fecha = DateTime.Today;
@@ -152,7 +152,7 @@ namespace Tests
             var qry = new Mock<AsistenciaQuery>(null);
             var tipoSvc = new Mock<TipoDeAsistenciaService>(null, null, null);
             var miembroXClaseSvc = new Mock<MiembroXClaseService>(null, null, null, null, null);
-            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null);
+            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null, null, null, null, null);
             var mapper = new Mock<AsistenciaMaper>(null, null, null);
 
             qry.Setup(q => q.GetAsistenciaById(It.IsAny<int>())).ReturnsAsync((Asistencia?)null);
@@ -170,7 +170,7 @@ namespace Tests
             var qry = new Mock<AsistenciaQuery>(null);
             var tipoSvc = new Mock<TipoDeAsistenciaService>(null, null, null);
             var miembroXClaseSvc = new Mock<MiembroXClaseService>(null, null, null, null, null);
-            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null);
+            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null, null, null, null, null);
             var mapper = new Mock<AsistenciaMaper>(null, null, null);
 
             var fecha = DateTime.Today;
@@ -264,7 +264,7 @@ namespace Tests
             var qry = new Mock<AsistenciaQuery>(null);
             var tipoSvc = new Mock<TipoDeAsistenciaService>(null, null, null);
             var miembroXClaseSvc = new Mock<MiembroXClaseService>(null, null, null, null, null);
-            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null);
+            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null, null, null, null, null);
             var mapper = new Mock<AsistenciaMaper>(null, null, null);
 
             // MembresiaXMiembro invalido
@@ -293,7 +293,7 @@ namespace Tests
             var qry = new Mock<AsistenciaQuery>(null);
             var tipoSvc = new Mock<TipoDeAsistenciaService>(null, null, null);
             var miembroXClaseSvc = new Mock<MiembroXClaseService>(null, null, null, null, null);
-            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null);
+            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null, null, null, null, null);
             var mapper = new Mock<AsistenciaMaper>(null, null, null);
 
             membresiaXMiembroSvc.Setup(s => s.GetMembresiaXMiembroById(It.IsAny<int>())).ReturnsAsync(new MembresiaXMiembroResponse { MembresiaXMiembroId = 1, FechaInicio = DateTime.Today.AddDays(-30), FechaFin = DateTime.Today.AddDays(30) });
@@ -321,7 +321,7 @@ namespace Tests
             var qry = new Mock<AsistenciaQuery>(null);
             var tipoSvc = new Mock<TipoDeAsistenciaService>(null, null, null);
             var miembroXClaseSvc = new Mock<MiembroXClaseService>(null, null, null, null, null);
-            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null);
+            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null, null, null, null, null);
             var mapper = new Mock<AsistenciaMaper>(null, null, null);
 
             membresiaXMiembroSvc.Setup(s => s.GetMembresiaXMiembroById(It.IsAny<int>())).ReturnsAsync(new MembresiaXMiembroResponse { MembresiaXMiembroId = 1, FechaInicio = DateTime.Today.AddDays(-30), FechaFin = DateTime.Today.AddDays(30) });
@@ -349,7 +349,7 @@ namespace Tests
             var qry = new Mock<AsistenciaQuery>(null);
             var tipoSvc = new Mock<TipoDeAsistenciaService>(null, null, null);
             var miembroXClaseSvc = new Mock<MiembroXClaseService>(null, null, null, null, null);
-            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null);
+            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null, null,null,null,null);
             var mapper = new Mock<AsistenciaMaper>(null, null, null);
 
             var fechaInicio = DateTime.Today;
@@ -424,7 +424,7 @@ namespace Tests
             var qry = new Mock<AsistenciaQuery>(null);
             var tipoSvc = new Mock<TipoDeAsistenciaService>(null, null, null);
             var miembroXClaseSvc = new Mock<MiembroXClaseService>(null, null, null, null, null);
-            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null);
+            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null, null, null, null, null);
             var mapper = new Mock<AsistenciaMaper>(null, null, null);
 
             qry.Setup(q => q.GetAsistenciaById(It.IsAny<int>())).ReturnsAsync((Asistencia?)null);
@@ -449,7 +449,7 @@ namespace Tests
             var qry = new Mock<AsistenciaQuery>(null);
             var tipoSvc = new Mock<TipoDeAsistenciaService>(null, null, null);
             var miembroXClaseSvc = new Mock<MiembroXClaseService>(null, null, null, null, null);
-            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null);
+            var membresiaXMiembroSvc = new Mock<MembresiaXMiembroService>(null, null, null, null, null, null, null);
             var mapper = new Mock<AsistenciaMaper>(null, null, null);
 
             var existing = new Asistencia

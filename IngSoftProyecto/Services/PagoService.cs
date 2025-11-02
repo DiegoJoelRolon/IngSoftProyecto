@@ -75,6 +75,15 @@ namespace IngSoftProyecto.Services
             {
                 throw new BadRequestException("El descuento aplicado debe estar entre 0 y 100.");
             }
+
+            if (request.FechaPago.Date > DateTime.Now.Date)
+            {
+                throw new BadRequestException("La fecha de pago no puede ser futura.");
+            }
+            if (string.IsNullOrWhiteSpace(request.MetodoPago))
+            {
+                throw new BadRequestException("El método de pago es obligatorio.");
+            }
             return true;
         }
     }

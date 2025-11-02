@@ -18,11 +18,22 @@ namespace IngSoftProyecto.Services
         private readonly EstadoMembresiaQuery _estadoMembresiaQuery;
         private readonly PagoService _pagoService;
 
-        public MembresiaXMiembroService(MembresiaXMiembroCommand membresiaXMiembroCommand, MembresiaXMiembroQuery membresiaXMiembroQuery, MembresiaXMiembroMapper membresiaXMiembroMapper)
+        public MembresiaXMiembroService(
+            MembresiaXMiembroCommand membresiaXMiembroCommand,
+            MembresiaXMiembroQuery membresiaXMiembroQuery,
+            MembresiaXMiembroMapper membresiaXMiembroMapper,
+            MiembroService miembroService,
+            MembresiasService membresiaService,
+            EstadoMembresiaQuery estadoMembresiaQuery,
+            PagoService pagoService)
         {
             _membresiaXMiembroCommand = membresiaXMiembroCommand;
             _membresiaXMiembroQuery = membresiaXMiembroQuery;
             _membresiaXMiembroMapper = membresiaXMiembroMapper;
+            _miembroService = miembroService;
+            _membresiaService = membresiaService;
+            _estadoMembresiaQuery = estadoMembresiaQuery;
+            _pagoService = pagoService;
         }
         virtual public async Task<MembresiaXMiembroResponse> AddMembresiaXMiembro(MembresiaXMiembroRequest request)
         {
@@ -74,6 +85,7 @@ namespace IngSoftProyecto.Services
         }
         private async Task<bool> CheckMembresiaXMiembroRequest(MembresiaXMiembroRequest request)
         {
+
             if (await _miembroService.GetMiembroById(request.MiembroId)==null)
             {
                 throw new BadRequestException("Id invalido en la solicitud de Miembro");
@@ -105,6 +117,10 @@ namespace IngSoftProyecto.Services
             {
                 throw new NotFoundException("Pago no encontrado.");
             }
+            if (pago.FechaPago > request.FechaInicio)
+            {
+                throw new BadRequestException("El pago debe realizarse por adelantado. La fecha de pago no puede ser posterior a la fecha de inicio de la membresía.");
+            }
 
             if (request.FechaFin <= request.FechaInicio)
             {
@@ -117,6 +133,19 @@ namespace IngSoftProyecto.Services
             if (duracionReal.TotalDays != membresia.DuracionEnDias)
             {
                 throw new BadRequestException($"Duración incorrecta. La membresía seleccionada dura {membresia.DuracionEnDias} días.");
+            }
+            var montoEsperado = membresia.CostoBase * (1 - (pago.DescuentoAplicado / 100m));
+
+            if (Math.Abs(pago.Monto - montoEsperado) > 0.01m) // Usar un margen de error para decimales
+            {
+                throw new BadRequestException("El monto del pago no coincide con el costo de la membresía con el descuento aplicado.");
+            }
+
+            var ultimaMembresia = await _membresiaXMiembroQuery.GetUltimaMembresiaActiva(request.MiembroId);
+
+            if (ultimaMembresia != null && ultimaMembresia.FechaFin >= request.FechaInicio)
+            {
+                throw new BadRequestException("El miembro ya tiene una membresía activa o superpuesta.");
             }
 
             return true;

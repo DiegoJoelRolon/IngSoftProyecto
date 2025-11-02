@@ -29,5 +29,16 @@ namespace IngSoftProyecto.CQRS.Queries
                 .Include(mxm => mxm.Pago)
                 .ToListAsync();
         }
+        virtual public async Task<MembresiaXMiembro> GetUltimaMembresiaActiva(int miembroId)
+        {
+            // 1. Filtrar por el ID del miembro.
+            // 2. Filtrar donde la FechaFin sea igual o posterior a la fecha y hora actuales (membresía vigente).
+            return await _context.MembresiasXMiembros
+                .Include(mxm => mxm.Membresia) // Necesitamos incluir Membresia para saber su duración y costo
+                .Where(mxm => mxm.MiembroId == miembroId &&
+                              mxm.FechaFin >= DateTime.Now)
+                .OrderByDescending(mxm => mxm.FechaFin) // Ordenamos para asegurar que traemos la que finaliza más tarde
+                .FirstOrDefaultAsync();
+        }
     }
 }
